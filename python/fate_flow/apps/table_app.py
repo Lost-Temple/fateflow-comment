@@ -17,6 +17,7 @@ from fate_arch import storage
 from fate_arch.metastore.db_utils import StorageConnector
 from fate_arch.session import Session
 from fate_arch.storage import StorageTableMeta, StorageTableOrigin
+from fate_flow import manager
 from fate_flow.entity import RunParameters
 from fate_flow.manager.data_manager import DataTableTracker, TableStorage, SchemaMetaParam, AnonymousGenerator
 from fate_flow.operation.job_saver import JobSaver

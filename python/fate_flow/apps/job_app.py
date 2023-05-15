@@ -21,6 +21,7 @@ import tarfile
 from flask import abort, request, send_file
 
 from fate_arch.common.base_utils import json_dumps, json_loads
+from fate_flow import manager
 from fate_flow.controller.job_controller import JobController
 from fate_flow.entity import JobConfigurationBase, RetCode
 from fate_flow.entity.run_status import FederatedSchedulingStatusCode, JobStatus

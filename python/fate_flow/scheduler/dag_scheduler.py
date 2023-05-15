@@ -66,7 +66,7 @@ class DAGScheduler(Cron):
                 common_job_parameters.model_version = job_id
                 train_runtime_conf = {}
             else:
-                # check predict job parameters
+                # check predict job parameters // 检查预测 job 的参数
                 detect_utils.check_config(common_job_parameters.to_dict(), ["model_id", "model_version"])
 
                 # get inference dsl from pipeline model as job dsl
@@ -133,7 +133,7 @@ class DAGScheduler(Cron):
                 inheritance_jobs = JobSaver.query_job(job_id=job.f_inheritance_info.get("job_id"), role=job_initiator["role"], party_id=job_initiator["party_id"])
                 inheritance_tasks = JobSaver.query_task(job_id=job.f_inheritance_info.get("job_id"), role=job_initiator["role"], party_id=job_initiator["party_id"], only_latest=True)
                 job_utils.check_job_inheritance_parameters(job, inheritance_jobs, inheritance_tasks)
-
+            # 创建作业
             status_code, response = FederatedScheduler.create_job(job=job)
             if status_code != FederatedSchedulingStatusCode.SUCCESS:
                 job.f_status = JobStatus.FAILED

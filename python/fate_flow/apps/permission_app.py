@@ -15,6 +15,7 @@
 #
 from flask import request
 
+from fate_flow import manager
 from fate_flow.controller.permission_controller import PermissionController
 from fate_flow.entity.permission_parameters import PermissionParameters
 from fate_flow.utils import api_utils

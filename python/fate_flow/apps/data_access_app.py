@@ -18,6 +18,7 @@ from pathlib import Path
 
 from flask import request
 
+from fate_flow import manager
 from fate_flow.entity.run_status import StatusSet
 from fate_flow.entity import JobConfigurationBase
 from fate_arch import storage
@@ -29,7 +30,6 @@ from fate_flow.utils import detect_utils, job_utils
 from fate_flow.scheduler.dag_scheduler import DAGScheduler
 from fate_flow.operation.job_saver import JobSaver
 
-
 page_name = 'data'
 
 
@@ -37,13 +37,14 @@ page_name = 'data'
 def download_upload(access_module):
     job_id = job_utils.generate_job_id()
 
-    if access_module == "upload" and UPLOAD_DATA_FROM_CLIENT and not (request.json and request.json.get("use_local_data") == 0):
+    if access_module == "upload" and UPLOAD_DATA_FROM_CLIENT and not (
+            request.json and request.json.get("use_local_data") == 0):
         file = request.files['file']
         filename = Path(job_utils.get_job_directory(job_id), 'fate_upload_tmp', uuid1().hex)
         filename.parent.mkdir(parents=True, exist_ok=True)
 
         try:
-            file.save(str(filename))
+            file.save(str(filename))  # 把接收到的文件存放到服务器本地的一个目录中
         except Exception as e:
             try:
                 filename.unlink()
@@ -57,7 +58,7 @@ def download_upload(access_module):
             # higher than version 1.5.1, support eggroll run parameters
             job_config = json_loads(list(job_config.keys())[0])
 
-        job_config['file'] = str(filename)
+        job_config['file'] = str(filename)  # 上传数据配置文件中file参数的值设置为数据文件在服务器本地的路径
     else:
         job_config = request.json
 
@@ -97,7 +98,8 @@ def download_upload(access_module):
                                    retmsg='The data table already exists.'
                                           'If you still want to continue uploading, please add the parameter --drop')
     job_dsl, job_runtime_conf = gen_data_access_job_config(job_config, access_module)
-    submit_result = DAGScheduler.submit(JobConfigurationBase(**{'dsl': job_dsl, 'runtime_conf': job_runtime_conf}), job_id=job_id)
+    submit_result = DAGScheduler.submit(JobConfigurationBase(**{'dsl': job_dsl, 'runtime_conf': job_runtime_conf}),
+                                        job_id=job_id)
     data.update(submit_result)
     return get_json_result(job_id=job_id, data=data)
 
@@ -106,7 +108,8 @@ def download_upload(access_module):
 def upload_history():
     request_data = request.json
     if request_data.get('job_id'):
-        tasks = JobSaver.query_task(component_name='upload_0', status=StatusSet.SUCCESS, job_id=request_data.get('job_id'), run_on_this_party=True)
+        tasks = JobSaver.query_task(component_name='upload_0', status=StatusSet.SUCCESS,
+                                    job_id=request_data.get('job_id'), run_on_this_party=True)
     else:
         tasks = JobSaver.query_task(component_name='upload_0', status=StatusSet.SUCCESS, run_on_this_party=True)
     limit = request_data.get('limit')
@@ -152,7 +155,8 @@ def gen_data_access_job_config(config_data, access_module):
     initiator_party_id = config_data.get('party_id', 0)
     job_runtime_conf["initiator"]["role"] = initiator_role
     job_runtime_conf["initiator"]["party_id"] = initiator_party_id
-    job_parameters_fields = {"task_cores", "eggroll_run", "spark_run", "computing_engine", "storage_engine", "federation_engine"}
+    job_parameters_fields = {"task_cores", "eggroll_run", "spark_run", "computing_engine", "storage_engine",
+                             "federation_engine"}
     for _ in job_parameters_fields:
         if _ in config_data:
             job_runtime_conf["job_parameters"]["common"][_] = config_data[_]
@@ -164,30 +168,30 @@ def gen_data_access_job_config(config_data, access_module):
 
     if access_module == 'upload':
         parameters = {
-                "head",
-                "partition",
-                "file",
-                "namespace",
-                "name",
-                "id_delimiter",
-                "storage_engine",
-                "storage_address",
-                "destroy",
-                "extend_sid",
-                "auto_increasing_sid",
-                "block_size",
-                "schema",
-                "with_meta",
-                "meta"
-            }
+            "head",
+            "partition",
+            "file",
+            "namespace",
+            "name",
+            "id_delimiter",
+            "storage_engine",
+            "storage_address",
+            "destroy",
+            "extend_sid",
+            "auto_increasing_sid",
+            "block_size",
+            "schema",
+            "with_meta",
+            "meta"
+        }
         update_config(job_runtime_conf, job_dsl, initiator_role, parameters, access_module, config_data)
 
     if access_module == 'download':
         parameters = {
-                "delimiter",
-                "output_path",
-                "namespace",
-                "name"
+            "delimiter",
+            "output_path",
+            "namespace",
+            "name"
         }
         update_config(job_runtime_conf, job_dsl, initiator_role, parameters, access_module, config_data)
 
@@ -208,7 +212,8 @@ def update_config(job_runtime_conf, job_dsl, initiator_role, parameters, access_
     job_runtime_conf["component_parameters"]['role'][initiator_role]["0"][f"{access_module}_0"] = {}
     for p in parameters:
         if p in config_data:
-            job_runtime_conf["component_parameters"]['role'][initiator_role]["0"][f"{access_module}_0"][p] = config_data[p]
+            job_runtime_conf["component_parameters"]['role'][initiator_role]["0"][f"{access_module}_0"][p] = \
+            config_data[p]
     job_runtime_conf['dsl_version'] = 2
     job_dsl["components"][f"{access_module}_0"] = {
         "module": access_module.capitalize()

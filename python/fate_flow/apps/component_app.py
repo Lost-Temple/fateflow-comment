@@ -16,6 +16,7 @@
 from flask import request
 
 from fate_arch.common.file_utils import get_federatedml_setting_conf_directory
+from fate_flow import manager
 
 from fate_flow.component_env_utils.env_utils import get_class_object
 from fate_flow.db.component_registry import ComponentRegistry

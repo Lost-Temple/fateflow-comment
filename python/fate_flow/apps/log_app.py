@@ -15,6 +15,7 @@
 #
 from flask import request
 
+from fate_flow import manager
 from fate_flow.utils.api_utils import get_json_result, cluster_route
 from fate_flow.utils.log_sharing_utils import LogCollector
 

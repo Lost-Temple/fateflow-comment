@@ -20,6 +20,7 @@ import tarfile
 from flask import send_file, request
 
 from fate_arch.common import file_utils
+from fate_flow import manager
 from fate_flow.settings import TEMPLATE_INFO_PATH
 from fate_flow.utils.base_utils import get_fate_flow_directory
 

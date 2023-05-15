@@ -18,6 +18,7 @@ from pathlib import Path
 
 from flask import request
 
+from fate_flow import manager
 from fate_flow.db.component_registry import ComponentRegistry
 from fate_flow.entity import ComponentProvider, RetCode
 from fate_flow.entity.types import WorkerName

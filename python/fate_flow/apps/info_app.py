@@ -19,6 +19,7 @@ from flask import request
 from flask.json import jsonify
 
 from fate_arch.common import FederatedMode
+from fate_flow import manager
 
 from fate_flow.db.runtime_config import RuntimeConfig
 from fate_flow.db.service_registry import ServerRegistry
