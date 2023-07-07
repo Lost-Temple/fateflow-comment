@@ -68,6 +68,7 @@ class LinkisSparkEngine(EngineABC):
         }
         task_info["engine_conf"]["data"] = data
         task_info["engine_conf"]["headers"] = headers
+        # 提交计算任务到linkis
         res = requests.post(url=linkis_execute_url, headers=headers, json=data)
         schedule_logger(task.f_job_id).info(f"start linkis spark task: {res.text}")
         if res.status_code == 200:

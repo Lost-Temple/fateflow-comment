@@ -61,8 +61,8 @@ if __name__ == '__main__':
     )
 
     # init db
-    init_flow_db()
-    init_arch_db()
+    init_flow_db()  # 初始化数据库表
+    init_arch_db()  # 初始化元数据表:t_storage_connector t_storage_table_meta t_session_record
     # init runtime config
     import argparse
     parser = argparse.ArgumentParser()
@@ -81,8 +81,11 @@ if __name__ == '__main__':
     RuntimeConfig.init_config(JOB_SERVER_HOST=HOST, HTTP_PORT=HTTP_PORT)
     RuntimeConfig.set_process_role(ProcessRole.DRIVER)
 
+    # 目前只支持zookeeper，把服务名，服务的url保存存在zk中
     RuntimeConfig.set_service_db(service_db())
+    # 把flow server的地址保存到zk中
     RuntimeConfig.SERVICE_DB.register_flow()
+    # 从数据库中加载模型的信息，把节点中的所有的模型的id,version保存到zk中
     RuntimeConfig.SERVICE_DB.register_models()
 
     ComponentRegistry.load()

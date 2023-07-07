@@ -63,7 +63,7 @@ class BaseDataBase:
     def __init__(self):
         database_config = DATABASE.copy()
         db_name = database_config.pop("name")
-        if IS_STANDALONE and not bool(int(os.environ.get("FORCE_USE_MYSQL", 0))):
+        if IS_STANDALONE and not bool(int(os.environ.get("FORCE_USE_MYSQL", 0))):  # 如果是单机版 && 未指定要求强制使用MYSQL
             # sqlite does not support other options
             Insert.on_conflict = lambda self, *args, **kwargs: self.on_conflict_replace()
 
@@ -71,7 +71,7 @@ class BaseDataBase:
             self.database_connection = APSWDatabase(file_utils.get_project_base_directory("fate_sqlite.db"))
             RuntimeConfig.init_config(USE_LOCAL_DATABASE=True)
             stat_logger.info('init sqlite database on standalone mode successfully')
-        else:
+        else:  # 使用MYSQL
             self.database_connection = PooledMySQLDatabase(db_name, **database_config)
             stat_logger.info('init mysql database on cluster mode successfully')
 
