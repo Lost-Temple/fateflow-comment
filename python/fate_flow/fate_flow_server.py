@@ -76,6 +76,7 @@ if __name__ == '__main__':
     RuntimeConfig.DEBUG = args.debug
     if RuntimeConfig.DEBUG:
         stat_logger.info("run on debug mode")
+    # 加载各种配置文件
     ConfigManager.load()
     RuntimeConfig.init_env()
     RuntimeConfig.init_config(JOB_SERVER_HOST=HOST, HTTP_PORT=HTTP_PORT)
