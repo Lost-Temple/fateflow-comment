@@ -82,7 +82,7 @@ if __name__ == '__main__':
     RuntimeConfig.init_config(JOB_SERVER_HOST=HOST, HTTP_PORT=HTTP_PORT)
     RuntimeConfig.set_process_role(ProcessRole.DRIVER)
 
-    # 目前只支持zookeeper，把服务名，服务的url保存存在zk中
+    # 根据USE_REGISTRY变量，如果为TRUE，则使用zk保存, 目前只支持zookeeper，把服务名，服务的url保存存在zk中
     RuntimeConfig.set_service_db(service_db())
     # 把flow server的地址保存到zk中
     RuntimeConfig.SERVICE_DB.register_flow()
