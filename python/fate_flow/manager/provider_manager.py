@@ -55,6 +55,7 @@ class ProviderManager:
     @classmethod
     def get_fate_flow_provider(cls):
         path = get_fate_flow_python_directory("fate_flow")
+        # get_version() 函数会从 fate.env 文件中读取FATEFlow的版本信息
         provider = ComponentProvider(name="fate_flow", version=get_versions()["FATEFlow"], path=path, class_path=ComponentRegistry.get_default_class_path())
         return provider
 
