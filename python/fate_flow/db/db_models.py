@@ -139,12 +139,12 @@ class DataBaseModel(BaseModel):
 
 @DB.connection_context()
 def init_database_tables():
-    members = inspect.getmembers(sys.modules[__name__], inspect.isclass)
+    members = inspect.getmembers(sys.modules[__name__], inspect.isclass) # 获取当前模块中的所有的类
     table_objs = []
     create_failed_list = []
     for name, obj in members:
-        if obj != DataBaseModel and issubclass(obj, DataBaseModel):
-            table_objs.append(obj)
+        if obj != DataBaseModel and issubclass(obj, DataBaseModel): # 判断当前的类是否是DataBaseModel的子类
+            table_objs.append(obj) # 如果是DataBaseModel的子类，那就添加到table_objs中，后续需要在数据库中创建对应的表
             LOGGER.info(f"start create table {obj.__name__}")
             try:
                 obj.create_table()

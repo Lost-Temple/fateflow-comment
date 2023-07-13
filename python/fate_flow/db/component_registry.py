@@ -136,7 +136,7 @@ class ComponentRegistry:
     @DB.connection_context()
     def get_from_db(cls, component_registry):
         # get component registry info
-        component_list = ComponentInfo.select()
+        component_list = ComponentInfo.select() # 查t_component_info表
         for component in component_list:
             component_registry["components"][component.f_component_name] = {
                 "default_provider": component.f_default_provider,
