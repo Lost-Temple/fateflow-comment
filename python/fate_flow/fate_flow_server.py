@@ -61,8 +61,10 @@ if __name__ == '__main__':
     )
 
     # init db
-    init_flow_db()  # 初始化数据库表
-    init_arch_db()  # 初始化元数据表:t_storage_connector t_storage_table_meta t_session_record
+    # python/fate_flow/db/db_models.py中的model
+    init_flow_db()
+    # fate_arch/metastore/db_models.py中的model
+    init_arch_db()
     # init runtime config
     import argparse
     parser = argparse.ArgumentParser()
@@ -88,14 +90,18 @@ if __name__ == '__main__':
     RuntimeConfig.SERVICE_DB.register_flow()
     # 从数据库中加载模型的信息，把节点中的所有的模型的id,version保存到zk中
     RuntimeConfig.SERVICE_DB.register_models()
-
+    # component相关
     ComponentRegistry.load()
     default_algorithm_provider = ProviderManager.register_default_providers()
     RuntimeConfig.set_component_provider(default_algorithm_provider)
     ComponentRegistry.load()
+    # hook函数管理器初始化，从配置文件中读取需要hook的模块
     HookManager.init()
+    # site key的管理，对应数据库中t_site_key_info
     RsaKeyManager.init()
+    # 版本控制，检查provider的版本是否和目前的fate版本兼容之类的, 在配置文件incompatible_version.yaml中配置不兼容的版本
     VersionController.init()
+    # 检测器，定时检测job,task,session等
     Detector(interval=5 * 1000, logger=detect_logger).start()
     FederatedDetector(interval=10 * 1000, logger=detect_logger).start()
     DAGScheduler(interval=2 * 1000, logger=schedule_logger()).start()

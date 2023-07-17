@@ -59,7 +59,7 @@ class DAGScheduler(Cron):
             common_job_parameters.roles = runtime_conf["role"]
             common_job_parameters.role_parameters = runtime_conf.get("job_parameters", {}).get("role", {})
 
-            if common_job_parameters.job_type != "predict":
+            if common_job_parameters.job_type != "predict": # job_tyoe 为非预测的分支
                 # generate job model info
                 conf_version = schedule_utils.get_conf_version(runtime_conf)
                 if conf_version != 2:
@@ -67,8 +67,8 @@ class DAGScheduler(Cron):
                 common_job_parameters.model_id = model_utils.gen_model_id(runtime_conf["role"])
                 common_job_parameters.model_version = job_id
                 train_runtime_conf = {}
-            else:
-                # check predict job parameters // 检查预测 job 的参数
+            else: # job_type 是预测的分支
+                # check predict job parameters # 检查预测 job 的参数
                 detect_utils.check_config(common_job_parameters.to_dict(), ["model_id", "model_version"])
 
                 # get inference dsl from pipeline model as job dsl

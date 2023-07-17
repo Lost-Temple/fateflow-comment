@@ -146,7 +146,7 @@ class ComponentRegistry:
             for component_alias in component.f_component_alias:
                 component_registry["components"][component_alias] = component_registry["components"][component.f_component_name]
 
-        provider_list = ComponentProviderInfo.select()
+        provider_list = ComponentProviderInfo.select() # 查t_component_provider_info表
 
         # get key names from `fateflow/conf/component_registry.json`
         default_version_keys = {
@@ -169,7 +169,7 @@ class ComponentRegistry:
                 "python": provider_info.f_python,
                 "class_path": provider_info.f_class_path
             }
-            modules_list = ComponentRegistryInfo.select().where(
+            modules_list = ComponentRegistryInfo.select().where( # 查t_component_registry表
                 ComponentRegistryInfo.f_provider_name == provider_info.f_provider_name,
                 ComponentRegistryInfo.f_version == provider_info.f_version
             )

@@ -14,7 +14,7 @@ class HookManager:
 
     @staticmethod
     def init():
-        if HOOK_MODULE is not None:
+        if HOOK_MODULE is not None: # service_conf.yaml 中是否配置了module
             for modules in HOOK_MODULE.values():
                 for module in modules.split(";"):
                     try:
