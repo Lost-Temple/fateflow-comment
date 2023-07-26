@@ -164,12 +164,13 @@ class FederatedScheduler(SchedulerBase):
             dest_partis = job.f_roles.items()
             api_type = "party"
         threads = []
+        # 这里就是和联邦内所有的party之间交互
         for dest_role, dest_party_ids in dest_partis:
             federated_response[dest_role] = {}
             for dest_party_id in dest_party_ids:
                 endpoint = f"/{api_type}/{job.f_job_id}/{dest_role}/{dest_party_id}/{command}"
                 args = (job.f_job_id, job.f_role, job.f_party_id, dest_role, dest_party_id, endpoint, command_body, job_parameters["federated_mode"], federated_response)
-                if parallel:
+                if parallel: # 传参进来表示需要起一个线程执行
                     t = threading.Thread(target=cls.federated_command, args=args)
                     threads.append(t)
                     t.start()

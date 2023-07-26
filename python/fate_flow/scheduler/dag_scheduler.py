@@ -59,16 +59,17 @@ class DAGScheduler(Cron):
             common_job_parameters.roles = runtime_conf["role"]
             common_job_parameters.role_parameters = runtime_conf.get("job_parameters", {}).get("role", {})
 
-            if common_job_parameters.job_type != "predict": # job_tyoe 为非预测的分支
+            if common_job_parameters.job_type != "predict": # job_type 为非predict的分支
                 # generate job model info
-                conf_version = schedule_utils.get_conf_version(runtime_conf)
-                if conf_version != 2:
+                conf_version = schedule_utils.get_conf_version(runtime_conf) # 获取dsl_version的值
+                if conf_version != 2: # 这里校验一下版本，版本还是硬编码的...也就是说非predict类型的JOB，DSL版本必须为2
                     raise Exception("only the v2 version runtime conf is supported")
+                # 生成模型id
                 common_job_parameters.model_id = model_utils.gen_model_id(runtime_conf["role"])
-                common_job_parameters.model_version = job_id
+                common_job_parameters.model_version = job_id # 把job_id 赋给model_version ???
                 train_runtime_conf = {}
-            else: # job_type 是预测的分支
-                # check predict job parameters # 检查预测 job 的参数
+            else: # job_type 是predict的分支
+                # check predict job parameters # 检查参数
                 detect_utils.check_config(common_job_parameters.to_dict(), ["model_id", "model_version"])
 
                 # get inference dsl from pipeline model as job dsl

@@ -20,6 +20,7 @@ from copy import deepcopy
 
 from fate_flow.entity import RunParameters
 
+# 根据DSL的版本去适配 JobRuntimeConfig
 
 class JobRuntimeConfigAdapter(object):
     def __init__(self, job_runtime_conf):

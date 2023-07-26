@@ -38,7 +38,7 @@ def download_upload(access_module):
     job_id = job_utils.generate_job_id()
 
     if access_module == "upload" and UPLOAD_DATA_FROM_CLIENT and not (
-            request.json and request.json.get("use_local_data") == 0):
+            request.json and request.json.get("use_local_data") == 0): # 默认1，代表使用client机器的数据;0代表使用fate flow服务所在机器的数据
         file = request.files['file']
         filename = Path(job_utils.get_job_directory(job_id), 'fate_upload_tmp', uuid1().hex)
         filename.parent.mkdir(parents=True, exist_ok=True)
@@ -59,7 +59,7 @@ def download_upload(access_module):
             job_config = json_loads(list(job_config.keys())[0])
 
         job_config['file'] = str(filename)  # 上传数据配置文件中file参数的值设置为数据文件在服务器本地的路径
-    else:
+    else: # 数据来源在配置文件中指定，不由客户端上传
         job_config = request.json
 
     required_arguments = ['namespace', 'table_name']
@@ -92,12 +92,15 @@ def download_upload(access_module):
             job_config["destroy"] = False
         data['table_name'] = job_config["table_name"]
         data['namespace'] = job_config["namespace"]
+        # 这里使用job_config中的table_name和namespace在数据库中t_storage_table_meta表中查询数据是否已存在
         data_table_meta = storage.StorageTableMeta(name=job_config["table_name"], namespace=job_config["namespace"])
-        if data_table_meta and not job_config["destroy"]:
+        if data_table_meta and not job_config["destroy"]: # 如果已存在且请求中drop参数为0，则直接返回数据表已存在
             return get_json_result(retcode=100,
                                    retmsg='The data table already exists.'
                                           'If you still want to continue uploading, please add the parameter --drop')
+    # 生成根据job_conf生成job_dsl和job_runtime_conf
     job_dsl, job_runtime_conf = gen_data_access_job_config(job_config, access_module)
+    # 根据job_dsl和job_runtime_conf提交这个job
     submit_result = DAGScheduler.submit(JobConfigurationBase(**{'dsl': job_dsl, 'runtime_conf': job_runtime_conf}),
                                         job_id=job_id)
     data.update(submit_result)
