@@ -78,7 +78,7 @@ class Writer(ComponentBase):
         engine = self.parameters.get("storage_engine")
         address_dict = self.parameters.get("address")
 
-        if output_name and output_namespace:
+        if output_name and output_namespace: # 组合参数，指定out_name和out_namespace时，把数据在引擎内另存一份
             table_meta = src_table.meta.to_dict()
             address_dict = src_table.meta.get_address().__dict__
             engine = src_table.meta.get_engine()
@@ -101,7 +101,7 @@ class Writer(ComponentBase):
                     "job_id": self.tracker.job_id,
                 }
             )
-
+        # 如果请求中包含了 engine和address_dict，把数据导出到外部的存储引擎中去，目前只支持MySql
         elif engine and address_dict:
             save_data_to_external_storage(engine, address_dict, src_table)
 
