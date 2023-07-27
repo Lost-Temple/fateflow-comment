@@ -138,11 +138,11 @@ class Upload(ComponentBase):
                 EngineType.STORAGE
             ]
         job_id = self.task_version_id.split("_")[0]
-        if not os.path.isabs(self.parameters.get("file", "")):
+        if not os.path.isabs(self.parameters.get("file", "")): # 如果是相对路径，那就在相对路径头上上加fate_flow的路径
             self.parameters["file"] = os.path.join(
                 get_fate_flow_directory(), self.parameters["file"]
             )
-        if not os.path.exists(self.parameters["file"]):
+        if not os.path.exists(self.parameters["file"]): # 判断文件是否存在，这个目录下是存储客户端上传的文件，稍后会被存入存储引擎中
             raise Exception(
                 "%s is not exist, please check the configure"
                 % (self.parameters["file"])
@@ -165,12 +165,12 @@ class Upload(ComponentBase):
         else:
             raise Exception("'head' in conf.json should be 0 or 1")
         partitions = self.parameters["partition"]
-        if partitions <= 0 or partitions >= self.MAX_PARTITIONS:
+        if partitions <= 0 or partitions >= self.MAX_PARTITIONS: # 这里最大分区数为1024
             raise Exception(
                 "Error number of partition, it should between %d and %d"
                 % (0, self.MAX_PARTITIONS)
             )
-        self.session_id = job_utils.generate_session_id(
+        self.session_id = job_utils.generate_session_id( # 这里的session_id的生成规则也要注意一下, 不是胡乱生成的
             self.tracker.task_id,
             self.tracker.task_version,
             self.tracker.role,
@@ -178,14 +178,14 @@ class Upload(ComponentBase):
         )
         sess = Session.get_global()
         self.session = sess
-        if self.parameters.get("destroy", False):
+        if self.parameters.get("destroy", False): # 如果是带了drop参数值为1的情况, 客户端请求中传过来的是drop参数，fate_flow把这个参数用destroy来代替了
             table = sess.get_table(namespace=namespace, name=name)
             if table:
                 LOGGER.info(
                     f"destroy table name: {name} namespace: {namespace} engine: {table.engine}"
                 )
                 try:
-                    table.destroy()
+                    table.destroy() # 删除存储引擎中的表
                 except Exception as e:
                     LOGGER.error(e)
             else:
@@ -233,6 +233,7 @@ class Upload(ComponentBase):
         )
         self.parameters["partitions"] = partitions
         self.parameters["name"] = name
+        # 这里在存储引擎中创建表,后续写入数据
         self.table = storage_session.create_table(address=address, origin=StorageTableOrigin.UPLOAD, **self.parameters)
         if storage_engine not in [StorageEngine.PATH]:
             data_table_count = self.save_data_table(job_id, name, namespace, head)

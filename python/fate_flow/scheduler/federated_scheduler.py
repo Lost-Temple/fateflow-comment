@@ -168,16 +168,16 @@ class FederatedScheduler(SchedulerBase):
         for dest_role, dest_party_ids in dest_partis:
             federated_response[dest_role] = {}
             for dest_party_id in dest_party_ids:
-                endpoint = f"/{api_type}/{job.f_job_id}/{dest_role}/{dest_party_id}/{command}"
+                endpoint = f"/{api_type}/{job.f_job_id}/{dest_role}/{dest_party_id}/{command}" # ../scheduling_apps/ 下的 party_app.py或initiator_app.py中的api的endpoint
                 args = (job.f_job_id, job.f_role, job.f_party_id, dest_role, dest_party_id, endpoint, command_body, job_parameters["federated_mode"], federated_response)
                 if parallel: # 传参进来表示需要起一个线程执行
-                    t = threading.Thread(target=cls.federated_command, args=args)
+                    t = threading.Thread(target=cls.federated_command, args=args) # 这里才是真正调用fateflow的api，即使是本机也是一样调用http api, 这里是起一个线程进行调用
                     threads.append(t)
                     t.start()
                 else:
-                    cls.federated_command(*args)
+                    cls.federated_command(*args) # 这里调用fateflow的api，不起线程
         for thread in threads:
-            thread.join()
+            thread.join() # 如果是多线程执行，那这里会阻塞直到线程执行结束
         return cls.return_federated_response(federated_response=federated_response)
 
     @classmethod

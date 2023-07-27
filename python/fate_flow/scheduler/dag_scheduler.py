@@ -76,7 +76,7 @@ class DAGScheduler(Cron):
                 tracker = Tracker(job_id=job_id, role=job_initiator["role"], party_id=job_initiator["party_id"],
                                   model_id=common_job_parameters.model_id, model_version=common_job_parameters.model_version)
 
-                if ENABLE_MODEL_STORE:
+                if ENABLE_MODEL_STORE: # 在配置文件中配置，默认不开启，目前支持mysql/tencent cos
                     sync_model = SyncModel(
                         role=tracker.role, party_id=tracker.party_id,
                         model_id=tracker.model_id, model_version=tracker.model_version,
@@ -103,7 +103,7 @@ class DAGScheduler(Cron):
             job.f_initiator_party_id = job_initiator["party_id"]
             job.f_role = job_initiator["role"]
             job.f_party_id = job_initiator["party_id"]
-
+            # 在{FATE_FLOW_BASE}/jobs/{job_id}/ 目录下保存配置文件
             path_dict = job_utils.save_job_conf(job_id=job_id,
                                                 role=job.f_initiator_role,
                                                 party_id=job.f_initiator_party_id,
@@ -112,7 +112,7 @@ class DAGScheduler(Cron):
                                                 runtime_conf_on_party={},
                                                 train_runtime_conf=train_runtime_conf,
                                                 pipeline_dsl=None)
-
+            # intiator_party_id 需要被包含在 runtime_config中的对应的配置里面
             if job.f_initiator_party_id not in runtime_conf["role"][job.f_initiator_role]:
                 msg = f"initiator party id {job.f_initiator_party_id} not in roles {runtime_conf['role']}"
                 schedule_logger(job_id).info(msg)
