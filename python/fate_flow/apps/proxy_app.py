@@ -17,7 +17,6 @@ from flask import request
 from flask.json import jsonify
 
 from fate_arch.common import FederatedMode
-from fate_flow import manager
 
 from fate_flow.utils.api_utils import federated_api, forward_api, proxy_api
 

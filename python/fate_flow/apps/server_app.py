@@ -15,7 +15,6 @@
 #
 from flask import request
 
-from fate_flow import manager
 from fate_flow.db.runtime_config import RuntimeConfig
 from fate_flow.utils.api_utils import get_json_result
 from fate_flow.settings import API_VERSION

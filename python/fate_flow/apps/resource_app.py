@@ -15,7 +15,6 @@
 #
 from flask import request
 
-from fate_flow import manager
 from fate_flow.manager.resource_manager import ResourceManager
 from fate_flow.utils.api_utils import get_json_result
 from fate_flow.utils.api_utils import validate_request

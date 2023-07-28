@@ -23,7 +23,6 @@ from flask import abort, request, send_file
 
 from fate_arch.common import FederatedMode
 from fate_arch.common.base_utils import json_dumps, json_loads
-from fate_flow import manager
 
 from fate_flow.db.db_models import (
     DB, ModelTag, PipelineComponentMeta, Tag,

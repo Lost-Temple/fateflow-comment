@@ -18,7 +18,6 @@ from pathlib import Path
 
 from flask import request
 
-from fate_flow import manager
 from fate_flow.entity.run_status import StatusSet
 from fate_flow.entity import JobConfigurationBase
 from fate_arch import storage

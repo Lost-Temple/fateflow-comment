@@ -18,7 +18,6 @@ import os
 
 from flask import jsonify, request, send_file
 
-from fate_flow import manager
 from fate_flow.component_env_utils import feature_utils
 from fate_flow.component_env_utils.env_utils import import_component_output_depend
 from fate_flow.db.db_models import DB, Job
