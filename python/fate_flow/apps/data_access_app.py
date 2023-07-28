@@ -59,7 +59,7 @@ def download_upload(access_module):
             job_config = json_loads(list(job_config.keys())[0])
 
         job_config['file'] = str(filename)  # 上传数据配置文件中file参数的值设置为数据文件在服务器本地的路径
-    else: # 数据来源在配置文件中指定，不由客户端上传
+    else: # 数据不由客户端上传，使用fate flow所在机器的数据, 路径还是配置文件中file这个参数批定
         job_config = request.json
 
     required_arguments = ['namespace', 'table_name']
