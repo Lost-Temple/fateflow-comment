@@ -60,23 +60,23 @@ def table_bind():
                                                                       storage.StorageEngine.MYSQL, storage.StorageEngine.PATH,
                                                                       storage.StorageEngine.API} else 0)
     destroy = (int(request_data.get("drop", 0)) == 1)
-    data_table_meta = storage.StorageTableMeta(name=name, namespace=namespace)
+    data_table_meta = storage.StorageTableMeta(name=name, namespace=namespace) # 如果在t_storage_table_meta中已经存在
     if data_table_meta:
-        if destroy:
+        if destroy: # 这就是drop 参数值为1
             data_table_meta.destroy_metas()
         else:
             return get_json_result(retcode=100,
                                    retmsg='The data table already exists.'
                                           'If you still want to continue uploading, please add the parameter --drop')
     id_column = request_data.get("id_column") or request_data.get("id_name")
-    feature_column = request_data.get("feature_column") or request_data.get("feature_name")
-    schema = get_bind_table_schema(id_column, feature_column)
+    feature_column = request_data.get("feature_column") or request_data.get("feature_name")  # 绑定table时请求报文中feature_column传递特征列的列名
+    schema = get_bind_table_schema(id_column, feature_column)  # 把特征列名保存到schema中，schema中包含了sid, header
     schema.update(extra_schema)
     if request_data.get("with_meta", False):
         meta = SchemaMetaParam(**request_data.get("meta", {}))
         if request_data.get("extend_sid", False):
             meta.with_match_id = True
-        schema.update({"meta": meta.to_dict()})
+        schema.update({"meta": meta.to_dict()})  # 如果请求包中有meta，也保存在schema中
         extra_schema["meta"] = meta.to_dict()
     sess = Session()
     storage_session = sess.storage(storage_engine=engine, options=request_data.get("options"))
@@ -157,7 +157,7 @@ def table_download():
         need_head=request_data.get("head", True)
     )
 
-
+# 预览表数据，如果是bind的外部存储引擎中的表，好像不能预览，这个后续再确认一下
 @manager.route('/preview', methods=['post'])
 def table_data_preview():
     request_data = request.json
@@ -187,7 +187,7 @@ def table_delete():
         return get_json_result(data=data)
     return get_json_result(retcode=101, retmsg='no find table')
 
-
+#  表设置为可用/不可用状态，还分两个url? body为空，还使用Post ？
 @manager.route('/disable', methods=['post'])
 @manager.route('/enable', methods=['post'])
 def table_disable():
@@ -205,11 +205,11 @@ def table_disable():
         return get_json_result(data=data)
     return get_json_result(retcode=101, retmsg='no find table')
 
-
+#  注意，这个是删除所有的状态为disable的表，包体为空就可以了，但还是post，这个接口看着像半成品
 @manager.route('/disable/delete', methods=['post'])
 def table_delete_disable():
-    request_data = request.json
-    adapter_request_data(request_data)
+    request_data = request.json  # 取出请求的包体内容
+    adapter_request_data(request_data)  # 这里把包体内的table_name转变为name，后面就没有对包体内容做什么操作了，半成品？
     tables_meta = storage.StorageTableMeta.query_table_meta(filter_fields={"disable": True})
     data = []
     sess = Session()
@@ -345,7 +345,7 @@ def get_component_module(component_name, job_dsl):
     return job_dsl["components"][component_name]["module"].lower()
 
 
-def adapter_request_data(request_data):
+def adapter_request_data(request_data):  # 把请求报文中的 table_name 这个key 改为 name
     if request_data.get("table_name"):
         request_data["name"] = request_data.get("table_name")
 

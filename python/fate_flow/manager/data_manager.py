@@ -90,8 +90,8 @@ class AnonymousGenerator(object):
 
     @staticmethod
     def migrate_schema_anonymous(anonymous_schema, role, party_id, migrate_mapping):
-        obj = env_utils.get_class_object("anonymous_generator")(role, party_id, migrate_mapping)
-        return obj.migrate_schema_anonymous(anonymous_schema)
+        obj = env_utils.get_class_object("anonymous_generator")(role, party_id, migrate_mapping)  # 获取的为 Anonymous 对象
+        return obj.migrate_schema_anonymous(anonymous_schema)  # 这里调用 Anonymous对象的migrate_schema_anonymous方法
 
     @staticmethod
     def generate_header(computing_table, schema):
