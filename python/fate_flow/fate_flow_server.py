@@ -93,7 +93,7 @@ if __name__ == '__main__':
     RuntimeConfig.SERVICE_DB.register_models()
     # component相关
     ComponentRegistry.load()
-    # 下面会把provider保存到数据库中
+    # 下面会把信息保存到数据库中，涉及到以下几张表: t_component_provider_info t_component_registry t_component_info
     default_algorithm_provider = ProviderManager.register_default_providers()
     RuntimeConfig.set_component_provider(default_algorithm_provider)
     ComponentRegistry.load()
