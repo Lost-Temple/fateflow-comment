@@ -28,7 +28,7 @@ class ProviderRegistrar(BaseWorker):
         provider = ComponentProvider(**self.args.config.get("provider"))
         support_components = ComponentRegistry.register_provider(provider)
         ComponentRegistry.register_components(provider.name, support_components)
-        ComponentRegistry.dump()
+        ComponentRegistry.dump()  # 这里就是把信息写入到数据库中的
         stat_logger.info(json_dumps(ComponentRegistry.REGISTRY, indent=4))
 
 

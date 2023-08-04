@@ -32,6 +32,7 @@ class ComponentRegistry:
 
     @classmethod
     def load(cls):
+        # 从加载FATE/fateflow/conf/job_default_config.yaml中的配置，然后从数据库中读取相关配置信息，设置值...
         component_registry = cls.get_from_db(file_utils.load_json_conf_real_time(FATE_FLOW_DEFAULT_COMPONENT_REGISTRY_PATH))
         cls.REGISTRY.update(component_registry)
         for provider_name, provider_info in cls.REGISTRY.get("providers", {}).items():
@@ -135,26 +136,29 @@ class ComponentRegistry:
     @classmethod
     @DB.connection_context()
     def get_from_db(cls, component_registry):
-        # get component registry info
+        # 获取数据库中的component info
         component_list = ComponentInfo.select()  # 查t_component_info表
         for component in component_list:
+            # 从数据库中读取component info，把它保存在component_registry对象的components节点下，如果本身已经在配置文件中存在的，会被覆盖
             component_registry["components"][component.f_component_name] = {
                 "default_provider": component.f_default_provider,
                 "support_provider": component.f_support_provider,
                 "alias": component.f_component_alias
             }
+            # component 的别名是一个数组，因为它可能有多个别名, 可能有多个component它们的名称只是大小写差异，但它们是同一个component, 所以别名可能就会有多个，但指的都是同一个component
             for component_alias in component.f_component_alias:
+                # 在components节点下，为每个别名创建一个component子节点，节点名就是别名，然后下面再挂上component真身
                 component_registry["components"][component_alias] = component_registry["components"][component.f_component_name]
 
         provider_list = ComponentProviderInfo.select()  # 查t_component_provider_info表
 
-        # get key names from `fateflow/conf/component_registry.json`
+        # 获取component_registry.json文件中的default_settings下的信息
         default_version_keys = {
             provider_name: default_settings["default_version_key"]
             for provider_name, default_settings in component_registry["default_settings"].items()
             if "default_version_key" in default_settings
         }
-
+        # 遍历数据库中读取的provider info列表
         for provider_info in provider_list:
             if provider_info.f_provider_name not in component_registry["providers"]:
                 component_registry["providers"][provider_info.f_provider_name] = {

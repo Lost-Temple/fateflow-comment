@@ -81,7 +81,7 @@ if __name__ == '__main__':
     # 加载各种配置文件,FATE/fateflow/conf/job_default_config.yaml 和 FATE/conf/service_conf.yaml
     # 根据配置文件中的引擎相关的配置，更新数据库表t_engine_registry中的信息
     ConfigManager.load()
-    RuntimeConfig.init_env()
+    RuntimeConfig.init_env()  # 从 FATE/fate.env中获取环境版本信息
     RuntimeConfig.init_config(JOB_SERVER_HOST=HOST, HTTP_PORT=HTTP_PORT)
     RuntimeConfig.set_process_role(ProcessRole.DRIVER)
 
@@ -89,10 +89,11 @@ if __name__ == '__main__':
     RuntimeConfig.set_service_db(service_db())
     # 把flow server的地址保存到zk中
     RuntimeConfig.SERVICE_DB.register_flow()
-    # 从数据库中加载模型的信息，把节点中的所有的模型的id,version保存到zk中
+    # 从数据库表t_machine_learning_model_info加载模型的信息，把节点中的所有的模型的download url保存到zk中
     RuntimeConfig.SERVICE_DB.register_models()
     # component相关
     ComponentRegistry.load()
+    # 下面会把provider保存到数据库中
     default_algorithm_provider = ProviderManager.register_default_providers()
     RuntimeConfig.set_component_provider(default_algorithm_provider)
     ComponentRegistry.load()
