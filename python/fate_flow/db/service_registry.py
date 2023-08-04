@@ -66,7 +66,7 @@ class ServerRegistry(ReloadConfigBase):
     MODEL_STORE_ADDRESS = None
     SERVINGS = None
     FATEMANAGER = None
-    STUDIO = None
+    STUDIO = None  # 这是什么玩意？好像没用到？
 
     @classmethod
     def load(cls):
@@ -81,20 +81,22 @@ class ServerRegistry(ReloadConfigBase):
             raise ValueError('invalid config file')
 
         local_path = path.with_name(f'local.{SERVICE_CONF}')
-        if local_path.exists():
+        if local_path.exists():  # 如果存在 local.service_config.yaml ，就使用这个yaml 文件中的配置
             local_conf = file_utils.load_yaml_conf(local_path)
             if not isinstance(local_conf, dict):
                 raise ValueError('invalid local config file')
-            conf.update(local_conf)
+            conf.update(local_conf)  # 这里是把local.service_config.yaml中的配置加载到conf中
         for k, v in conf.items():
-            if isinstance(v, dict):
-                setattr(cls, k.upper(), v)
+            if isinstance(v, dict):  # 是加载有子节点的那种配置，如果是只有一层的那种配置(就一个键值对的那种)，就不要了？
+                setattr(cls, k.upper(), v)  # 把键值变大写
 
+    # 这个是被server registry 接口调用
     @classmethod
     def register(cls, server_name, server_info):
         cls.save_server_info_to_db(server_name, server_info.get("host"), server_info.get("port"), protocol=server_info.get("protocol", "http"))
         setattr(cls, server_name, server_info)
 
+    # 这个是被service registry 接口调用，也就是创建service时被调用
     @classmethod
     def save(cls, service_config):
         update_server = {}
@@ -151,7 +153,7 @@ class ServerRegistry(ReloadConfigBase):
                 "port": server.f_port,
                 "protocol": server.f_protocol
             }
-            setattr(cls, server.f_server_name.upper(), server_info)
+            setattr(cls, server.f_server_name.upper(), server_info)  # 这里的做法感觉不太好，从数据库中读取t_server_registry_info 内的记录后，使用f_server_name作为键，万一这个服务名和类的某个属性恰好重名了呢？
 
 
     @classmethod

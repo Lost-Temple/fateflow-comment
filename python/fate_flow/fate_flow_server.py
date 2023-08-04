@@ -62,9 +62,9 @@ if __name__ == '__main__':
 
     # init db
     # python/fate_flow/db/db_models.py中的model
-    init_flow_db()
+    init_flow_db()  # init_database_tables as init_flow_db
     # fate_arch/metastore/db_models.py中的model
-    init_arch_db()
+    init_arch_db()  # init_database_tables as init_arch_db
     # init runtime config
     import argparse
     parser = argparse.ArgumentParser()
@@ -75,10 +75,11 @@ if __name__ == '__main__':
         print(get_versions())
         sys.exit(0)
     # todo: add a general init steps?
-    RuntimeConfig.DEBUG = args.debug
+    RuntimeConfig.DEBUG = args.debug  # 是否是DEBUG模式(要看运行时有没有带--debug参数)
     if RuntimeConfig.DEBUG:
         stat_logger.info("run on debug mode")
-    # 加载各种配置文件
+    # 加载各种配置文件,FATE/fateflow/conf/job_default_config.yaml 和 FATE/conf/service_conf.yaml
+    # 根据配置文件中的引擎相关的配置，更新数据库表t_engine_registry中的信息
     ConfigManager.load()
     RuntimeConfig.init_env()
     RuntimeConfig.init_config(JOB_SERVER_HOST=HOST, HTTP_PORT=HTTP_PORT)

@@ -23,9 +23,11 @@ class ConfigManager:
     @classmethod
     def load(cls):
         configs = {
+            # job的默认配置
             "job_default_config": JobDefaultConfig.load(),
+            # 从service_config.yaml和数据库表中加载配置信息，数据库中的信息是通过 FATE/fateflow/python/fate_flow/apps/service_app.py 的接口写入进去的
             "server_registry": ServerRegistry.load(),
         }
-        ResourceManager.initialize()
-        RuntimeConfig.load_config_manager()
+        ResourceManager.initialize()  # 引擎相关配置加载以及写入到数据表t_engine_registry
+        RuntimeConfig.load_config_manager()  # 设置 LOAD_CONFIG_MANAGER = TRUE，仅此而已
         return configs

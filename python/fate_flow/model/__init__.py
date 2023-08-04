@@ -122,12 +122,12 @@ class Locker:
     # https://docs.python.org/3/library/pickle.html#handling-stateful-objects
     def __getstate__(self):
         state = self.__dict__.copy()
-        state.pop('lock')
+        state.pop('lock')  # 在序列化前先把lock去除，防止把它一起进行了序列化
         return state
 
     def __setstate__(self, state):
-        self.__dict__.update(state)
-        self.lock = self._lock
+        self.__dict__.update(state)  # 把字典的其它属性还原到实例上
+        self.lock = self._lock  # 序列化后把lock还原到实例上
 
 
 class FileLock(_FileLock):

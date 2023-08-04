@@ -163,7 +163,7 @@ class CheckpointManager:
         self.task_id = task_id
         self.task_version = task_version
         self.job_parameters = job_parameters
-
+        # Path类重载了 / 运算符，把 / 的作用进行了变更, 所以下面的代码语法看上去很怪，但看上去更符合自然书写规律
         self.directory = (Path(get_fate_flow_directory()) / 'model_local_cache' /
                           self.party_model_id / model_version / 'checkpoint' / self.component_name)
 
@@ -186,7 +186,7 @@ class CheckpointManager:
             if not checkpoint.available:
                 continue
             checkpoints.append(checkpoint)
-
+        # deque 是双端队列
         self.checkpoints = deque(sorted(checkpoints, key=lambda i: i.step_index), self.max_checkpoints_number)
 
     @property

@@ -147,7 +147,7 @@ def init_database_tables():
             table_objs.append(obj)  # 如果是DataBaseModel的子类，那就添加到table_objs中，后续需要在数据库中创建对应的表
             LOGGER.info(f"start create table {obj.__name__}")
             try:
-                obj.create_table()
+                obj.create_table()  # 如果表不存在，就创建这个表
                 LOGGER.info(f"create table success: {obj.__name__}")
             except Exception as e:
                 LOGGER.exception(e)
