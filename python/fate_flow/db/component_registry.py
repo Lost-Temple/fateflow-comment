@@ -32,7 +32,7 @@ class ComponentRegistry:
 
     @classmethod
     def load(cls):
-        # 从加载FATE/fateflow/conf/job_default_config.yaml中的配置，然后从数据库中读取相关配置信息，设置值...
+        # 从加载FATE/fateflow/conf/component_registry.json中的配置，然后从数据库中读取相关配置信息，设置值...
         component_registry = cls.get_from_db(file_utils.load_json_conf_real_time(FATE_FLOW_DEFAULT_COMPONENT_REGISTRY_PATH))
         cls.REGISTRY.update(component_registry)
         for provider_name, provider_info in cls.REGISTRY.get("providers", {}).items():
