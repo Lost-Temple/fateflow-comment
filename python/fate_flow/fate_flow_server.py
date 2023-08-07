@@ -92,11 +92,11 @@ if __name__ == '__main__':
     # 从数据库表t_machine_learning_model_info加载模型的信息，把节点中的所有的模型的download url保存到zk中
     RuntimeConfig.SERVICE_DB.register_models()
     # component相关
-    ComponentRegistry.load()
+    ComponentRegistry.load()  # 先从配置文件中读取需要注册的组件的信息，并且会从数据库中读取组件提供者信息，组件信息等
     # 下面会把信息保存到数据库中，涉及到以下几张表: t_component_provider_info t_component_registry t_component_info
     default_algorithm_provider = ProviderManager.register_default_providers()
     RuntimeConfig.set_component_provider(default_algorithm_provider)
-    ComponentRegistry.load()
+    ComponentRegistry.load()  #
     # hook函数管理器初始化，从配置文件中读取需要hook的模块
     HookManager.init()
     # site key的管理，对应数据库中t_site_key_info

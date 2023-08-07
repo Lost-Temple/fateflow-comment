@@ -32,10 +32,11 @@ from fate_flow.utils.base_utils import get_fate_flow_python_directory
 class ProviderManager:
     @classmethod
     def register_default_providers(cls):
-        code, result = cls.register_fate_flow_provider()
+        code, result = cls.register_fate_flow_provider()  # 这里是先注册 FATE/fateflow/python/fate_flow下的Provider
+        # TODO 如果要添加其它目录下的component，需要在这里添加注册提供者的方法的调用
         if code != 0:
             raise Exception(f"register fate flow tools component failed")
-        code, result, provider = cls.register_default_fate_provider()
+        code, result, provider = cls.register_default_fate_provider()  # 这里是注册默认的fate下的provider
         if code != 0:
             raise Exception(f"register default fate algorithm component failed")
         return provider
@@ -54,6 +55,7 @@ class ProviderManager:
 
     @classmethod
     def get_fate_flow_provider(cls):
+        # 这里获取 FATE/fateflow/python下子目录的绝对路径，也就是FATE/FederateAI/FATE/fateflow/python/fate_flow的绝对路径
         path = get_fate_flow_python_directory("fate_flow")
         # get_version() 函数会从 fate.env 文件中读取FATEFlow的版本信息
         provider = ComponentProvider(name="fate_flow", version=get_versions()["FATEFlow"], path=path, class_path=ComponentRegistry.get_default_class_path())
@@ -66,8 +68,8 @@ class ProviderManager:
 
     @classmethod
     def get_default_fate_provider(cls):
-        path = JobDefaultConfig.default_component_provider_path.split("/")
-        path = file_utils.get_fate_python_directory(*path)
+        path = JobDefaultConfig.default_component_provider_path.split("/")  # 这里的path赋值为 federatedml
+        path = file_utils.get_fate_python_directory(*path)  # 这里得到 FATE/FederateAI/FATE/python/federatedml 的绝对路径
         if not os.path.exists(path):
             raise Exception(f"default fate provider not exists: {path}")
         provider = ComponentProvider(name="fate", version=get_versions()["FATE"], path=path, class_path=ComponentRegistry.get_default_class_path())

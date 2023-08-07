@@ -32,7 +32,7 @@ class ComponentRegistry:
 
     @classmethod
     def load(cls):
-        # 从加载FATE/fateflow/conf/component_registry.json中的配置，然后从数据库中读取相关配置信息，设置值...
+        # 先加载FATE/fateflow/conf/component_registry.json中的配置，然后从数据库中读取相关配置信息，设置值...
         component_registry = cls.get_from_db(file_utils.load_json_conf_real_time(FATE_FLOW_DEFAULT_COMPONENT_REGISTRY_PATH))
         cls.REGISTRY.update(component_registry)
         for provider_name, provider_info in cls.REGISTRY.get("providers", {}).items():
@@ -45,10 +45,10 @@ class ComponentRegistry:
     @classmethod
     def register_provider(cls, provider: ComponentProvider):
         provider_interface = provider_utils.get_provider_interface(provider)
-        support_components = provider_interface.get_names()
+        support_components = provider_interface.get_names()  # 这里就是去特定目录下匹配所有的组件的
         components = {}
         for component_alias, info in support_components.items():
-            component_name = component_alias.lower()
+            component_name = component_alias.lower()  # 组件别名可以多个，ComponentMeta实例化传入的参数就是名称/别名; 这里把名称/别名转为小写
             if component_name not in components:
                 components[component_name] = info
             elif components[component_name].get("module") != info.get("module"):

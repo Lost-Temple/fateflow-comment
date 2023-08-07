@@ -37,7 +37,7 @@ def _search_components(path, base):
     except ImportError as e:
         # or skip ?
         raise e
-    _obj_pairs = inspect.getmembers(module, lambda obj: isinstance(obj, ComponentMeta))
+    _obj_pairs = inspect.getmembers(module, lambda obj: isinstance(obj, ComponentMeta))  # 把是ComponentMeta类型的对象过滤出来
     return _obj_pairs, module_name
 
 
@@ -57,7 +57,7 @@ class Components:
     @classmethod
     def get_names(cls) -> typing.Dict[str, dict]:
         names = {}
-        for p in cls._components_base().glob("**/*.py"):
+        for p in cls._components_base().glob("**/*.py"):  # 匹配所有子目录下的py文件
             obj_pairs, module_name = _search_components(p.resolve(), cls._module_base())
             for name, obj in obj_pairs:
                 names[obj.name] = {"module": module_name}

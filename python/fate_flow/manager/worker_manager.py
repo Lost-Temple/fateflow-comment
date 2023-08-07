@@ -48,7 +48,7 @@ class WorkerManager:
             config = {
                 "provider": provider.to_dict()
             }
-            if worker_name == WorkerName.PROVIDER_REGISTRAR:
+            if worker_name == WorkerName.PROVIDER_REGISTRAR:  # 这里是用来注册Provider用的
                 from fate_flow.worker.provider_registrar import ProviderRegistrar
                 module = ProviderRegistrar
                 module_file_path = sys.modules[ProviderRegistrar.__module__].__file__
@@ -94,7 +94,7 @@ class WorkerManager:
             ])
 
         process_cmd.extend(specific_cmd)
-        if run_in_subprocess:
+        if run_in_subprocess:  # 标识是否起一个子进行运行，当调试运行时，这个值会强制设为True
             p = process_utils.run_subprocess(job_id=job_id, config_dir=config_dir, process_cmd=process_cmd,
                                              added_env=cls.get_env(job_id, provider_info), log_dir=log_dir,
                                              cwd_dir=config_dir, process_name=worker_name.value, process_id=worker_id)
