@@ -36,7 +36,7 @@ class ComponentRegistry:
         component_registry = cls.get_from_db(file_utils.load_json_conf_real_time(FATE_FLOW_DEFAULT_COMPONENT_REGISTRY_PATH))
         cls.REGISTRY.update(component_registry)
         for provider_name, provider_info in cls.REGISTRY.get("providers", {}).items():
-            if not ComponentProviderName.valid(provider_name):
+            if not ComponentProviderName.valid(provider_name):  # 这里只支持 fate fate_flow fate_sql 三种类型
                 raise Exception(f"not support component provider: {provider_name}")
         cls.REGISTRY["providers"] = cls.REGISTRY.get("providers", {})
         cls.REGISTRY["components"] = cls.REGISTRY.get("components", {})
@@ -160,11 +160,11 @@ class ComponentRegistry:
         }
         # 遍历数据库中读取的provider info列表
         for provider_info in provider_list:
-            if provider_info.f_provider_name not in component_registry["providers"]:
+            if provider_info.f_provider_name not in component_registry["providers"]:  # 在数据库里面有存在，但是在component_registry.json中没有对应的配置
                 component_registry["providers"][provider_info.f_provider_name] = {
                     "default": {
-                        "version": get_versions()[default_version_keys[provider_info.f_provider_name]]
-                        if provider_info.f_provider_name in default_version_keys else provider_info.f_version,
+                        "version": get_versions()[default_version_keys[provider_info.f_provider_name]]  # get_versions() 是从 FATE/FederateAI/FATE/fate.env 中读取配置的版本信息
+                        if provider_info.f_provider_name in default_version_keys else provider_info.f_version,  # 如果没有在component_registry.json中配置，那就使用数据库中的版本信息
                     }
                 }
 

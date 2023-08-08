@@ -37,7 +37,10 @@ def provider_update():
         return get_json_result(retcode=RetCode.OPERATING_ERROR, retmsg=f"not load into memory")
     return get_json_result()
 
-
+# 这个的目的是用来注册跟当前fate/fate_flow不同版本的下的那些components的provider的。
+# 注册时传进来的path如果是相对路径，那就是相对于FATE/fateflow/python/fate_flow
+# 如 ../component_plugins/yunphant，注意yunphant目录结构有要求, 下面必须有一个components子目录，components子目录下
+# 必须要有一个components.py, 还有就是存放其它的component了。name仅支持 fate/fate_flow/fate_sql
 @manager.route('/register', methods=['POST'])
 @validate_request("name", "version", "path")
 def register():
