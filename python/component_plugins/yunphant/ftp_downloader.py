@@ -8,7 +8,7 @@ from _base import (
 
 LOGGER = log.getLogger()
 
-ftp_downloader_cpn_meta = ComponentMeta("Ftp_Download")
+ftp_downloader_cpn_meta = ComponentMeta("FtpDownload")
 
 
 # import pysftp
