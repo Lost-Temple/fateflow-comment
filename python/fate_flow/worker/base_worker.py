@@ -139,7 +139,7 @@ class BaseWorker:
                 ComponentRegistry.load()
             if not RuntimeConfig.LOAD_CONFIG_MANAGER:
                 ConfigManager.load()
-            result = self._run() # 这里会调用具体的子类里面的实现
+            result = self._run()  # 这里会调用具体的子类里面的实现
         except Exception as e:
             LOGGER.exception(e)
             traceback.print_exc()

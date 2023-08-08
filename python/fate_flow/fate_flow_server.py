@@ -96,7 +96,7 @@ if __name__ == '__main__':
     # 下面会把信息保存到数据库中，涉及到以下几张表: t_component_provider_info t_component_registry t_component_info
     default_algorithm_provider = ProviderManager.register_default_providers()
     RuntimeConfig.set_component_provider(default_algorithm_provider)
-    ComponentRegistry.load()  #
+    ComponentRegistry.load()  # 这里又调用了一遍，原因是数据库表里面的数据可能发生变化了，所以要重新load一下。
     # hook函数管理器初始化，从配置文件中读取需要hook的模块
     HookManager.init()
     # site key的管理，对应数据库中t_site_key_info
