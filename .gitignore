@@ -27,7 +27,7 @@ venv
 *.whl
 /conf/local.*.yaml
 /cluster-deploy/FATE_install_*
-/python/component_plugins/
+#/python/component_plugins/
 
 # doc
 /site/
