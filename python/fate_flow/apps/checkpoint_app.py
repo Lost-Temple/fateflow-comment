@@ -26,7 +26,7 @@ def load_checkpoints():
         check_config(request.json, required_args)
     except Exception as e:
         abort(error_response(400, str(e)))
-
+    # 下面一句的传参有点特色：** 表示取出字典中的键值对作为参数，这个i代表reuired_args中的元素，然后i的值作字典的键，值为request.json[i]
     checkpoint_manager = CheckpointManager(**{i: request.json[i] for i in required_args})
     checkpoint_manager.load_checkpoints_from_disk()
     return checkpoint_manager

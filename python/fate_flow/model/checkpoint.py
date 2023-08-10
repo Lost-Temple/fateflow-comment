@@ -13,6 +13,7 @@
 #  See the License for the specific language governing permissions and
 #  limitations under the License.
 #
+# 相关文档参考:FATE/fateflow/doc/fate_flow_model_registry.zh.md
 import hashlib
 from pathlib import Path
 from typing import Dict, Tuple

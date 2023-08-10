@@ -29,13 +29,13 @@ from fate_flow.utils.base_utils import compare_version, get_fate_flow_directory
 def all_party_key(all_party):
     """
     Join all party as party key
-    :param all_party:
-        "role": {
+    :param :
+         {
             "guest": [9999],
             "host": [10000],
             "arbiter": [10000]
          }
-    :return:
+    :return: arbiter-10000#guest-9999#host-10000
     """
     if not all_party:
         all_party_key = 'all'
@@ -53,6 +53,10 @@ def all_party_key(all_party):
 
 
 def gen_party_model_id(model_id, role, party_id):
+    """
+    如果model_id 为空,则函数返回None
+    如果model_id 不为空,则函数返回 role#party_id#model_id,其中role,party_id,model_id分别是具体的值
+    """
     return '#'.join([role, str(party_id), model_id]) if model_id else None
 
 
