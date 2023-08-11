@@ -95,6 +95,7 @@ class SyncModel(Pipelined):
     def remote_exists(self):
         return self.model_storage.exists(**self.model_storage_parameters)
 
+    # 查数据库表t_machine_learning_model_info，获取对应的模型信息
     def get_model(self):
         return MLModel.get(
             MLModel.f_role == self.role,
@@ -124,13 +125,13 @@ class SyncModel(Pipelined):
 
     @DB.connection_context()
     def download(self, force_update=False):
-        if self.local_exists() and not force_update:
+        if self.local_exists() and not force_update:  # 如果本地存在且不强制更新，就直接返回了
             return
 
         with self.lock:
-            model = self.get_model()
-
-            self.model_storage.restore(
+            model = self.get_model()  # 查找数据库中的模型元数据信息
+            # 把模型从tencent cos或mysql 中获取过来放到本地缓存中
+            self.model_storage.restore(  # 这里有两种实现，一种是tencent cos 的，一种是mysql的，系统支持这两个方式的模型存储
                 force_update=force_update, hash_=model.f_archive_sha256,
                 **self.model_storage_parameters,
             )

@@ -120,13 +120,13 @@ class MysqlModelStorage(ModelStorageBase):
             self.close_connection()
 
     def restore(self, model_id: str, model_version: str, store_address: dict, force_update: bool = False, hash_: str = None):
-        '''
+        """
         Restore model from mysql to local cache
         :param model_id:
         :param model_version:
         :param store_address:
         :return:
-        '''
+        """
         model = PipelinedModel(model_id, model_version)
         self.get_connection(store_address)
 

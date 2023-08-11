@@ -119,7 +119,7 @@ def federated_api(job_id, method, endpoint, src_party_id, dest_party_id, src_rol
         'dest_party_id': dest_party_id,
         'src_role': src_role,
     })
-
+    # 这里是站点认证相关的，如果启用站点认证，要有站点的签名, 放在http请求的头里面
     if SITE_AUTHENTICATION:
         sign_obj = HookManager.site_signature(SignatureParameters(PARTY_ID, json_body))
         headers['site_signature'] = sign_obj.site_signature or ''
@@ -134,7 +134,7 @@ def federated_api(job_id, method, endpoint, src_party_id, dest_party_id, src_rol
         'json_body': json_body,
         'headers': headers,
     }
-
+    # 这里就是单机的情况（有些只需要单机，不需要联邦，比如站点上传数据集）
     if federated_mode == FederatedMode.SINGLE or kwargs['dest_party_id'] == '0':
         kwargs.update({
             'host': RuntimeConfig.JOB_SERVER_HOST,
@@ -142,7 +142,7 @@ def federated_api(job_id, method, endpoint, src_party_id, dest_party_id, src_rol
         })
 
         return federated_coordination_on_http(**kwargs)
-
+    # 这里是多方参与的情况
     if federated_mode == FederatedMode.MULTIPLE:
         host, port, protocol = get_federated_proxy_address(kwargs['src_party_id'], kwargs['dest_party_id'])
         kwargs.update({
