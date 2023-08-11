@@ -185,13 +185,16 @@ def get_federated_proxy_address(src_party_id, dest_party_id):
     else:
         protocol = PROXY_PROTOCOL
 
-    if isinstance(PROXY, dict):
+    if isinstance(PROXY, dict):  # 配置文件中proxy 的值 有可能配置字典，有可能就就直接是一个键值对，这里是配成字典的方式
+        # 如果name值没有设置，默认为fateflow
         proxy_name = PROXY.get("name", CoordinationProxyService.FATEFLOW)
-
+        # 如果配的proxy 为 fateflow，且参数src_party_id == dest_party_id，则host和port就使用RuntimeConfig中的对应值来赋值
+        # 实际上就是配置文件中的fateflow下的host和http_port(本站点的地址和http端口), 这里不管src_party_id是不是本站点party_id，
+        # 只验证src_party_id和dest_part_id是否相等
         if proxy_name == CoordinationProxyService.FATEFLOW and src_party_id == dest_party_id:
             host = RuntimeConfig.JOB_SERVER_HOST
             port = RuntimeConfig.HTTP_PORT
-        else:
+        else:  # 否则，使用配置文件中的host和port赋值
             host = PROXY["host"]
             port = PROXY[f"{protocol}_port"]
 
@@ -200,7 +203,7 @@ def get_federated_proxy_address(src_party_id, dest_party_id):
             port,
             protocol,
         )
-
+    # proxy 的值 不是字典，比如这样配置 proxy: rollsite，如果配置成了rollsite，那就要使用fate_on_eggroll下的配置
     if PROXY == CoordinationProxyService.ROLLSITE:
         proxy_address = ServerRegistry.FATE_ON_EGGROLL[CoordinationProxyService.ROLLSITE]
 
@@ -209,7 +212,7 @@ def get_federated_proxy_address(src_party_id, dest_party_id):
             proxy_address.get("grpc_port", proxy_address["port"]),
             CoordinationCommunicationProtocol.GRPC,
         )
-
+    # proxy 配置成了 proxy: nginx, 那就要使用fate_on_spark 下面的配置信息
     if PROXY == CoordinationProxyService.NGINX:
         proxy_address = ServerRegistry.FATE_ON_SPARK[CoordinationProxyService.NGINX]
 

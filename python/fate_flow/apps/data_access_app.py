@@ -58,7 +58,7 @@ def download_upload(access_module):
             job_config = json_loads(list(job_config.keys())[0])
 
         job_config['file'] = str(filename)  # 上传数据配置文件中file参数的值设置为数据文件在服务器本地的路径
-    else: # 数据不由客户端上传，使用fate flow所在机器的数据, 路径还是配置文件中file这个参数批定
+    else:  # 数据不由客户端上传，使用fate flow所在机器的数据, 路径还是配置文件中file这个参数批定
         job_config = request.json
 
     required_arguments = ['namespace', 'table_name']
@@ -93,7 +93,7 @@ def download_upload(access_module):
         data['namespace'] = job_config["namespace"]
         # 这里使用job_config中的table_name和namespace在数据库中t_storage_table_meta表中查询数据是否已存在
         data_table_meta = storage.StorageTableMeta(name=job_config["table_name"], namespace=job_config["namespace"])
-        if data_table_meta and not job_config["destroy"]: # 如果已存在且请求中drop参数为0，则直接返回数据表已存在
+        if data_table_meta and not job_config["destroy"]:  # 如果已存在且请求中drop参数为0，则直接返回数据表已存在
             return get_json_result(retcode=100,
                                    retmsg='The data table already exists.'
                                           'If you still want to continue uploading, please add the parameter --drop')
