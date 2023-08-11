@@ -87,7 +87,7 @@ class JobController(object):
         cls.create_job_parameters_on_party(role=role, party_id=party_id, job_parameters=job_parameters)
         # update job parameters on party
         job_info["runtime_conf_on_party"]["job_parameters"] = job_parameters.to_dict()
-        JobSaver.create_job(job_info=job_info) # 把job_info保存到数据库表t_job中
+        JobSaver.create_job(job_info=job_info)  # 把job_info保存到数据库表t_job中
         schedule_logger(job_id).info("start initialize tasks")
         # 下面的流程很重要, 是真正开始创始task开始执行component的时候了.
         initialized_result, provider_group = cls.initialize_tasks(job_id=job_id,
