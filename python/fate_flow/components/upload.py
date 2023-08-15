@@ -165,12 +165,12 @@ class Upload(ComponentBase):
         else:
             raise Exception("'head' in conf.json should be 0 or 1")
         partitions = self.parameters["partition"]
-        if partitions <= 0 or partitions >= self.MAX_PARTITIONS: # 这里最大分区数为1024
+        if partitions <= 0 or partitions >= self.MAX_PARTITIONS:  # 这里最大分区数为1024
             raise Exception(
                 "Error number of partition, it should between %d and %d"
                 % (0, self.MAX_PARTITIONS)
             )
-        self.session_id = job_utils.generate_session_id( # 这里的session_id的生成规则也要注意一下, 不是胡乱生成的
+        self.session_id = job_utils.generate_session_id(  # 这里的session_id的生成规则也要注意一下, 不是胡乱生成的
             self.tracker.task_id,
             self.tracker.task_version,
             self.tracker.role,
@@ -178,14 +178,14 @@ class Upload(ComponentBase):
         )
         sess = Session.get_global()
         self.session = sess
-        if self.parameters.get("destroy", False): # 如果是带了drop参数值为1的情况, 客户端请求中传过来的是drop参数，fate_flow把这个参数用destroy来代替了
+        if self.parameters.get("destroy", False):  # 如果是带了drop参数值为1的情况, 客户端请求中传过来的是drop参数，fate_flow把这个参数用destroy来代替了
             table = sess.get_table(namespace=namespace, name=name)
             if table:
                 LOGGER.info(
                     f"destroy table name: {name} namespace: {namespace} engine: {table.engine}"
                 )
                 try:
-                    table.destroy() # 删除存储引擎中的表
+                    table.destroy()  # 删除存储引擎中的表
                 except Exception as e:
                     LOGGER.error(e)
             else:
