@@ -51,7 +51,7 @@ class SparkEngine(EngineABC):
         if deploy_mode not in ["client"]:
             raise ValueError(f"deploy mode {deploy_mode} not supported")
 
-        spark_submit_cmd = os.path.join(spark_home, "bin/spark-submit")
+        spark_submit_cmd = os.path.join(spark_home, "bin/spark-submit")  # spark-submit 工具是一个用于将Spark应用程序提交到集群上运行的命令行工具。
         executable = [spark_submit_cmd, f"--name={task.f_task_id}#{task.f_role}"]
         for k, v in spark_submit_config.items():
             if k != "conf":
