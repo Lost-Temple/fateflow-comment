@@ -48,7 +48,7 @@ class MetricManager:
             tracking_metric = model_class()
             tracking_metric.f_job_id = self.job_id
             tracking_metric.f_component_name = (self.component_name if not job_level
-                                                else job_utils.PIPELINE_COMPONENT_NAME)
+                                                else job_utils.PIPELINE_COMPONENT_NAME)  # 这里如果是job级别的就使用pipeline填充组件名，否则就使用组件自己的名称
             tracking_metric.f_task_id = self.task_id
             tracking_metric.f_task_version = self.task_version
             tracking_metric.f_role = self.role
@@ -118,7 +118,7 @@ class MetricManager:
                 tracking_metric_model.f_metric_name
             ).where(
                 tracking_metric_model.f_job_id == self.job_id,
-                tracking_metric_model.f_component_name == (self.component_name if not job_level else 'dag'),
+                tracking_metric_model.f_component_name == (self.component_name if not job_level else job_utils.PIPELINE_COMPONENT_NAME),  # 这里被我改过了, 这里应该是bug ?
                 tracking_metric_model.f_role == self.role,
                 tracking_metric_model.f_party_id == self.party_id
             ).distinct()
