@@ -69,7 +69,7 @@ class Tracker(object):
         self.metric_manager = MetricManager(job_id=self.job_id, role=self.role, party_id=self.party_id, component_name=self.component_name, task_id=self.task_id, task_version=self.task_version)
 
     def save_metric_data(self, metric_namespace: str, metric_name: str, metrics: typing.List[Metric], job_level=False):
-        schedule_logger(self.job_id).info(
+        schedule_logger(self.job_id).info(  # metric_data 举例，以上传数据集为例，metric_data 为 数据集中包含的数据条数
             'save component {} on {} {} {} {} metric data'.format(self.component_name, self.role,
                                                                   self.party_id, metric_namespace, metric_name))
         kv = []
@@ -91,7 +91,7 @@ class Tracker(object):
         return metrics
 
     def save_metric_meta(self, metric_namespace: str, metric_name: str, metric_meta: MetricMeta,
-                         job_level: bool = False):
+                         job_level: bool = False):  # metric_meta 举例：比如上传数据集时，metric_meta的值为 upload
         schedule_logger(self.job_id).info(
             'save component {} on {} {} {} {} metric meta'.format(self.component_name, self.role,
                                                                   self.party_id, metric_namespace, metric_name))
@@ -104,7 +104,7 @@ class Tracker(object):
             kv[k] = v
         return MetricMeta(name=kv.get('name'), metric_type=kv.get('metric_type'), extra_metas=kv)
 
-    def log_job_view(self, view_data: dict):
+    def log_job_view(self, view_data: dict):  # data_type 类型为2时，指的是job_view
         self.metric_manager.insert_metrics_into_db('job', 'job_view', 2, view_data.items(), job_level=True)
 
     @DB.connection_context()
