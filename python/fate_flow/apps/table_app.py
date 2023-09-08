@@ -60,10 +60,10 @@ def table_bind():
                                                                       storage.StorageEngine.MYSQL, storage.StorageEngine.PATH,
                                                                       storage.StorageEngine.API} else 0)
     destroy = (int(request_data.get("drop", 0)) == 1)
-    data_table_meta = storage.StorageTableMeta(name=name, namespace=namespace) # 如果在t_storage_table_meta中已经存在
+    data_table_meta = storage.StorageTableMeta(name=name, namespace=namespace)  # 如果在t_storage_table_meta中已经存在
     if data_table_meta:
-        if destroy: # 这就是drop 参数值为1
-            data_table_meta.destroy_metas()
+        if destroy:  # 这就是drop 参数值为1
+            data_table_meta.destroy_metas()  # 如果是drop，则把元数据库中的表元数据给删除掉
         else:
             return get_json_result(retcode=100,
                                    retmsg='The data table already exists.'
@@ -89,7 +89,7 @@ def table_bind():
                                          origin=request_data.get("origin", StorageTableOrigin.TABLE_BIND)
                                          )
     response = get_json_result(data={"table_name": name, "namespace": namespace})
-    if not table.check_address():
+    if not table.check_address():  # 检查外部数据源是否存在
         response = get_json_result(retcode=100, retmsg=f'engine {engine} address {address_dict} check failed')
     else:
         if request_data.get("extend_sid"):
