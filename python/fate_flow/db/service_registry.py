@@ -153,8 +153,8 @@ class ServerRegistry(ReloadConfigBase):
                 "port": server.f_port,
                 "protocol": server.f_protocol
             }
-            setattr(cls, server.f_server_name.upper(), server_info)  # 这里的做法感觉不太好，从数据库中读取t_server_registry_info 内的记录后，使用f_server_name作为键，万一这个服务名和类的某个属性恰好重名了呢？
-
+            # 这里的做法感觉不太好，从数据库中读取t_server_registry_info 内的记录后，使用f_server_name作为键，万一这个服务名和类的某个属性恰好重名了呢？
+            setattr(cls, server.f_server_name.upper(), server_info)
 
     @classmethod
     @DB.connection_context()

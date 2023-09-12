@@ -30,14 +30,14 @@ from fate_flow.db.db_models import Task
 
 class LinkisSparkEngine(EngineABC):
     def run(self, task: Task, run_parameters, run_parameters_path, config_dir, log_dir, cwd_dir, **kwargs):
-        linkis_execute_url = "http://{}:{}{}".format(ServerRegistry.LINKIS_SPARK_CONFIG.get("host"),
-                                                     ServerRegistry.LINKIS_SPARK_CONFIG.get("port"),
+        linkis_execute_url = "http://{}:{}{}".format(ServerRegistry.FATE_ON_SPARK.LINKIS_SPARK.get("host"),
+                                                     ServerRegistry.FATE_ON_SPARK.LINKIS_SPARK.get("port"),
                                                      LINKIS_EXECUTE_ENTRANCE)
-        headers = {"Token-Code": ServerRegistry.LINKIS_SPARK_CONFIG.get("token_code"),
+        headers = {"Token-Code": ServerRegistry.FATE_ON_SPARK.LINKIS_SPARK.get("token_code"),
                    "Token-User": kwargs.get("user_name"),
                    "Content-Type": "application/json"}
         schedule_logger(Task.f_job_id).info(f"headers:{headers}")
-        python_path = ServerRegistry.LINKIS_SPARK_CONFIG.get("python_path")
+        python_path = ServerRegistry.FATE_ON_SPARK.LINKIS_SPARK.get("python_path")
         execution_code = 'import sys\nsys.path.append("{}")\n' \
                          'from fate_flow.worker.task_executor import TaskExecutor\n' \
                          'task_info = TaskExecutor.run_task(job_id="{}",component_name="{}",' \
@@ -83,16 +83,16 @@ class LinkisSparkEngine(EngineABC):
 
     @staticmethod
     def kill(task):
-        linkis_query_url = "http://{}:{}{}".format(ServerRegistry.LINKIS_SPARK_CONFIG.get("host"),
-                                                   ServerRegistry.LINKIS_SPARK_CONFIG.get("port"),
+        linkis_query_url = "http://{}:{}{}".format(ServerRegistry.FATE_ON_SPARK.LINKIS_SPARK.get("host"),
+                                                   ServerRegistry.FATE_ON_SPARK.LINKIS_SPARK.get("port"),
                                                    LINKIS_QUERT_STATUS.replace("execID",
                                                                                task.f_engine_conf.get("execID")))
         headers = task.f_engine_conf.get("headers")
         response = requests.get(linkis_query_url, headers=headers).json()
         schedule_logger(task.f_job_id).info(f"querty task response:{response}")
         if response.get("data").get("status") != LinkisJobStatus.SUCCESS:
-            linkis_execute_url = "http://{}:{}{}".format(ServerRegistry.LINKIS_SPARK_CONFIG.get("host"),
-                                                         ServerRegistry.LINKIS_SPARK_CONFIG.get("port"),
+            linkis_execute_url = "http://{}:{}{}".format(ServerRegistry.FATE_ON_SPARK.LINKIS_SPARK.get("host"),
+                                                         ServerRegistry.FATE_ON_SPARK.LINKIS_SPARK.get("port"),
                                                          LINKIS_KILL_ENTRANCE.replace("execID",
                                                                                       task.f_engine_conf.get("execID")))
             schedule_logger(task.f_job_id).info(f"start stop task:{linkis_execute_url}")
@@ -106,8 +106,8 @@ class LinkisSparkEngine(EngineABC):
     def is_alive(self, task):
         process_exist = True
         try:
-            linkis_query_url = "http://{}:{}{}".format(ServerRegistry.LINKIS_SPARK_CONFIG.get("host"),
-                                                       ServerRegistry.LINKIS_SPARK_CONFIG.get("port"),
+            linkis_query_url = "http://{}:{}{}".format(ServerRegistry.FATE_ON_SPARK.LINKIS_SPARK.get("host"),
+                                                       ServerRegistry.FATE_ON_SPARK.LINKIS_SPARK.get("port"),
                                                        LINKIS_QUERT_STATUS.replace("execID", task.f_engine_conf.get("execID")))
             headers = task.f_engine_conf["headers"]
             response = requests.get(linkis_query_url, headers=headers).json()
