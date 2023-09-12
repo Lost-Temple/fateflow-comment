@@ -37,7 +37,7 @@ def download_upload(access_module):
     job_id = job_utils.generate_job_id()
 
     if access_module == "upload" and UPLOAD_DATA_FROM_CLIENT and not (
-            request.json and request.json.get("use_local_data") == 0): # 默认1，代表使用client机器的数据;0代表使用fate flow服务所在机器的数据
+            request.json and request.json.get("use_local_data") == 0):  # 默认1，代表使用client机器的数据;0代表使用fate flow服务所在机器的数据
         file = request.files['file']
         filename = Path(job_utils.get_job_directory(job_id), 'fate_upload_tmp', uuid1().hex)
         filename.parent.mkdir(parents=True, exist_ok=True)
