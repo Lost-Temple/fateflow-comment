@@ -138,11 +138,11 @@ class Upload(ComponentBase):
                 EngineType.STORAGE
             ]
         job_id = self.task_version_id.split("_")[0]
-        if not os.path.isabs(self.parameters.get("file", "")): # 如果是相对路径，那就在相对路径头上上加fate_flow的路径
+        if not os.path.isabs(self.parameters.get("file", "")):  # 如果是相对路径，那就在相对路径头上上加fate_flow的路径
             self.parameters["file"] = os.path.join(
                 get_fate_flow_directory(), self.parameters["file"]
             )
-        if not os.path.exists(self.parameters["file"]): # 判断文件是否存在，这个目录下是存储客户端上传的文件，稍后会被存入存储引擎中
+        if not os.path.exists(self.parameters["file"]):  # 判断文件是否存在，这个目录下是存储客户端上传的文件，稍后会被存入存储引擎中
             raise Exception(
                 "%s is not exist, please check the configure"
                 % (self.parameters["file"])
@@ -155,7 +155,7 @@ class Upload(ComponentBase):
             namespace = _namespace
         if name is None:
             name = _table_name
-        if self.parameters.get("with_meta"):
+        if self.parameters.get("with_meta"):  # 如果 有meta节点
             self.parameters["id_delimiter"] = self.parameters.get("meta").get("delimiter")
         read_head = self.parameters["head"]
         if read_head == 0:
