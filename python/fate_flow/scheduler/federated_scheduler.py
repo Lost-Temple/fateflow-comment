@@ -276,7 +276,7 @@ class FederatedScheduler(SchedulerBase):
         st = base_utils.current_timestamp()
         log_msg = f"sending {endpoint} federated command"
         schedule_logger(job_id).info(start_log(msg=log_msg))
-        try:
+        try:  # 使用request 向fate_flow 的 http api 发送请求
             response = federated_api(job_id=job_id,
                                      method='POST',
                                      endpoint=endpoint,

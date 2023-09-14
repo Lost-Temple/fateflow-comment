@@ -35,11 +35,11 @@ download_cpn_meta = ComponentMeta("Download")
 @download_cpn_meta.bind_param
 class DownloadParam(BaseParam):
     def __init__(
-        self,
-        output_path="",
-        delimiter=DEFAULT_ID_DELIMITER,
-        namespace="",
-        name="",
+            self,
+            output_path="",
+            delimiter=DEFAULT_ID_DELIMITER,
+            namespace="",
+            name="",
     ):
         self.output_path = output_path
         self.delimiter = delimiter
@@ -61,10 +61,11 @@ class Download(ComponentBase):
         self.parameters["role"] = cpn_input.roles["role"]
         self.parameters["local"] = cpn_input.roles["local"]
 
-        data_table_meta = storage.StorageTableMeta(name=self.parameters.get("name"), namespace=self.parameters.get("namespace"))
+        data_table_meta = storage.StorageTableMeta(name=self.parameters.get("name"),
+                                                   namespace=self.parameters.get("namespace"))
         TableStorage.send_table(
             output_tables_meta={"table": data_table_meta},
-            output_data_file_path = os.path.abspath(self.parameters["output_path"]),
+            output_data_file_path=os.path.abspath(self.parameters["output_path"]),
             local_download=True
         )
         self.callback_metric(

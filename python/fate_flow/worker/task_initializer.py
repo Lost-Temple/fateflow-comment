@@ -60,6 +60,8 @@ class TaskInitializer(BaseWorker):
                 task_info["component_module"] = parameters["module"]
                 task_info["provider_info"] = provider.to_dict()
                 task_info["component_parameters"] = parameters
+                # 这里会create_task，把Job，task，worker，保存到元数据库中,（只保存，不执行，执行是由定时任务从数据库中取出对应状态的Job
+                # 通过发送http请求，再通过worker/task_executor.py来执行组件的代码）
                 TaskController.create_task(role=self.args.role, party_id=self.args.party_id,
                                            run_on_this_party=common_task_info["run_on_this_party"],
                                            task_info=task_info)

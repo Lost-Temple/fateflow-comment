@@ -42,7 +42,7 @@ class WorkerManager:
                                                               job_id=job_id,
                                                               role=role,
                                                               party_id=party_id)
-        if worker_name in [WorkerName.PROVIDER_REGISTRAR, WorkerName.DEPENDENCE_UPLOAD]:
+        if worker_name in [WorkerName.PROVIDER_REGISTRAR, WorkerName.DEPENDENCE_UPLOAD]:  # 启动PROVIDER_REGISTRAR/DEPENDENCE_UPLOAD
             if not provider:
                 raise ValueError("no provider argument")
             config = {
@@ -61,7 +61,7 @@ class WorkerManager:
                     '--dependence_type', kwargs.get("dependence_type")
                 ]
             provider_info = provider.to_dict()
-        elif worker_name is WorkerName.TASK_INITIALIZER:
+        elif worker_name is WorkerName.TASK_INITIALIZER:  # 启动TASK_INITIALIZER
             if not initialized_config:
                 raise ValueError("no initialized_config argument")
             config = initialized_config
