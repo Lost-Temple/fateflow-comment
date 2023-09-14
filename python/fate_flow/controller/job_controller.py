@@ -89,7 +89,7 @@ class JobController(object):
         job_info["runtime_conf_on_party"]["job_parameters"] = job_parameters.to_dict()
         JobSaver.create_job(job_info=job_info)  # 把job_info保存到数据库表t_job中
         schedule_logger(job_id).info("start initialize tasks")
-        # 下面的流程很重要, 是真正开始创始task开始执行component的时候了.
+        # 下面的流程很重要, 是task开始执行component的时候了.
         initialized_result, provider_group = cls.initialize_tasks(job_id=job_id,
                                                                   role=role,
                                                                   party_id=party_id,
@@ -268,6 +268,7 @@ class JobController(object):
     def initialize_task(cls, role, party_id, task_info: dict):
         task_info["role"] = role
         task_info["party_id"] = party_id
+        # 这个是执行component的
         initialized_result, provider_group = cls.initialize_tasks(components=[task_info["component_name"]], **task_info)
         return initialized_result
 
@@ -304,7 +305,8 @@ class JobController(object):
             initialized_config = {}
             initialized_config.update(group_info)
             initialized_config["common_task_info"] = common_task_info
-            if run_on_this_party: # 调用 ../worker/task_initializer.py（根据worker_name参数决定调用哪个worker）
+            # 在本地执行的分支，调用 ../worker/task_initializer.py（根据worker_name参数决定调用哪个worker），这里执行的是task_initializer
+            if run_on_this_party:
                 code, _result = WorkerManager.start_general_worker(worker_name=WorkerName.TASK_INITIALIZER,
                                                                    job_id=job_id,
                                                                    role=role,
@@ -312,7 +314,7 @@ class JobController(object):
                                                                    initialized_config=initialized_config,
                                                                    run_in_subprocess=False if initialized_config["if_default_provider"] else True)
                 initialized_result.update(_result)
-            else:
+            else:  # 联邦作业的分支
                 cls.initialize_task_holder_for_scheduling(role=role,
                                                           party_id=party_id,
                                                           components=initialized_config["components"],

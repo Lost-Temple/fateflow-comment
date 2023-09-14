@@ -149,7 +149,7 @@ class DAGScheduler(Cron):
                     need_run_components[role] = {}
                     for party, res in response[role].items():
                         need_run_components[role][party] = [name for name, value in response[role][party]["data"]["components"].items() if value["need_run"] is True]
-                if common_job_parameters.federated_mode == FederatedMode.MULTIPLE:
+                if common_job_parameters.federated_mode == FederatedMode.MULTIPLE:  # 多方参与的JOB
                     # create the task holder in db to record information of all participants in the initiator for scheduling
                     for role, party_ids in job.f_roles.items():
                         for party_id in party_ids:

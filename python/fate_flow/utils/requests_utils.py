@@ -29,6 +29,9 @@ from fate_flow.settings import CLIENT_AUTHENTICATION, HTTP_APP_KEY, HTTP_SECRET_
 
 requests.models.complexjson.dumps = functools.partial(json.dumps, cls=CustomJSONEncoder)
 
+# 这里需要requests 包，在M1芯片下使用python3.8匹配的conda时，conda本身要求的requests版本是2.27以上，但是FATE要求的requests版
+# 本是小于2.26， 所以需要 conda install requests==2.25.1
+
 
 def request(**kwargs):
     sess = requests.Session()

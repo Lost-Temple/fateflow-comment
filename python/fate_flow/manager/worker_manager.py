@@ -140,6 +140,7 @@ class WorkerManager:
                         logger.exception(e)
         else:
             kwargs = cls.cmd_to_func_kwargs(process_cmd)
+            # 这里是执行 ../worker/ 目录下的对应的worker脚本
             code, message, result = module().run(**kwargs)
             if code == 0:
                 return code, result
