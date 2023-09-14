@@ -50,7 +50,7 @@ def validate_component_param():
         'component_module_name',
     ]
     config_keys = ['role']
-
+    # 验证DSL版本是否支持
     dsl_version = int(request.json.get('dsl_version', 0))
     parser_class = get_dsl_parser_by_version(dsl_version)
     if dsl_version == 1:
@@ -60,7 +60,7 @@ def validate_component_param():
     else:
         return error_response(400, 'unsupported dsl_version')
 
-    try:
+    try:  # 检查必选项
         check_config(request.json, required_keys + config_keys)
     except Exception as e:
         return error_response(400, str(e))

@@ -52,7 +52,7 @@ class Components:
 
     @classmethod
     def _components_base(cls):
-        return Path(cls.provider_path, 'components').resolve()
+        return Path(cls.provider_path, '').resolve()
 
     @classmethod
     def get_names(cls) -> typing.Dict[str, dict]:
