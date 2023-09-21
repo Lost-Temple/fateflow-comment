@@ -146,8 +146,9 @@ class TaskExecutor(BaseTaskWorker):
                 session_options = {}
 
             sess = session.Session(session_id=args.session_id)
+            # 这里调用as_global(), 把sess对象设置为SESSION类中的__GLOBAL_SESSION，要使用sess的时候调用 sess = Session.get_global()
             sess.as_global()
-            sess.init_computing(computing_session_id=args.session_id, options=session_options)
+            sess.init_computing(computing_session_id=args.session_id, options=session_options)  # 初始化计算引擎
             component_parameters_on_party["job_parameters"] = job_parameters.to_dict()
             roles = job_configuration.runtime_conf["role"]
             if set(roles) == {"local"}:

@@ -196,6 +196,7 @@ class Upload(ComponentBase):
         storage_session = sess.storage(
             storage_engine=storage_engine, options=self.parameters.get("options")
         )
+        # 根据不同类型的存储引擎，组装对应的Address
         upload_address = {}
         if storage_engine in {StorageEngine.EGGROLL, StorageEngine.STANDALONE}:
             upload_address = {
@@ -203,12 +204,12 @@ class Upload(ComponentBase):
                 "namespace": namespace,
                 "storage_type": EggRollStoreType.ROLLPAIR_LMDB,
             }
-        elif storage_engine in {StorageEngine.MYSQL, StorageEngine.HIVE}:
+        elif storage_engine in {StorageEngine.MYSQL, StorageEngine.HIVE}:  # MYSQL和HIVE归为一类
             if not address_dict.get("db") or not address_dict.get("name"):
                 upload_address = {"db": namespace, "name": name}
-        elif storage_engine in {StorageEngine.PATH}:
+        elif storage_engine in {StorageEngine.PATH}:  # PATH 单独一类
             upload_address = {"path": self.parameters["file"]}
-        elif storage_engine in {StorageEngine.HDFS}:
+        elif storage_engine in {StorageEngine.HDFS}:  # HDFS 单独一类
             upload_address = {
                 "path": default_input_fs_path(
                     name=name,
@@ -216,7 +217,7 @@ class Upload(ComponentBase):
                     prefix=address_dict.get("path_prefix"),
                 )
             }
-        elif storage_engine in {StorageEngine.LOCALFS}:
+        elif storage_engine in {StorageEngine.LOCALFS}:  # LOCALFS 单独一类
             upload_address = {
                 "path": default_input_fs_path(
                     name=name,
@@ -233,8 +234,11 @@ class Upload(ComponentBase):
         )
         self.parameters["partitions"] = partitions
         self.parameters["name"] = name
-        # 这里在存储引擎中创建表,后续写入数据
+        # 存储引擎的StorageSession类中如果没有create_table，那就是从StorageSessionBase继承过来的
+        # 基类StorageSessionBase中的create_table调用的是table()方法，所以实际上调用的是StorageSession类中的table
+        # 最后返回的是一个StorageTable 类型的对象
         self.table = storage_session.create_table(address=address, origin=StorageTableOrigin.UPLOAD, **self.parameters)
+        # 写入数据到存储引擎中
         if storage_engine not in [StorageEngine.PATH]:
             data_table_count = self.save_data_table(job_id, name, namespace, head)
         else:
@@ -263,7 +267,7 @@ class Upload(ComponentBase):
     def save_data_table(self, job_id, dst_table_name, dst_table_namespace, head=True):
         input_file = self.parameters["file"]
         input_feature_count = self.get_count(input_file)
-        self.upload_file(input_file, head, job_id, input_feature_count)
+        self.upload_file(input_file, head, job_id, input_feature_count)  # 调用upload_file, 在upload_file方法中实现数据写入
         table_count = self.table.count()
         metas_info = {
             "count": table_count,
@@ -273,7 +277,7 @@ class Upload(ComponentBase):
         if self.parameters.get("with_meta"):
             metas_info.update({"schema": self.generate_anonymous_schema()})
         self.table.meta.update_metas(**metas_info)
-        self.save_meta(
+        self.save_meta(  # 这里是 log_output_data_info/log_metric_data/set_metric_meta
             dst_table_namespace=dst_table_namespace,
             dst_table_name=dst_table_name,
             table_count=table_count,
@@ -293,8 +297,8 @@ class Upload(ComponentBase):
         get_line = self.get_line()
         line_index = 0
         LOGGER.info(input_feature_count)
-        while True:
-            lines = fp.readlines(JobDefaultConfig.upload_block_max_bytes)
+        while True:  # 循环读取文件每一行数据
+            lines = fp.readlines(JobDefaultConfig.upload_block_max_bytes)  # 读取文件中一行数据
             LOGGER.info(JobDefaultConfig.upload_block_max_bytes)
             if lines:
                 for line in lines:
@@ -311,14 +315,14 @@ class Upload(ComponentBase):
                     line_index += 1
                     if line_index <= 100:
                         part_of_data.append((k, v))
-                save_progress = line_index / input_feature_count * 100 // 1
+                save_progress = line_index / input_feature_count * 100 // 1  # 计算进度
                 job_info = {
                     "progress": save_progress,
                     "job_id": job_id,
                     "role": self.parameters["local"]["role"],
                     "party_id": self.parameters["local"]["party_id"],
                 }
-                ControllerClient.update_job(job_info=job_info)
+                ControllerClient.update_job(job_info=job_info)  # 更新Job信息，主要就是更新一下JOB的进度
             else:
                 return
 
@@ -332,6 +336,7 @@ class Upload(ComponentBase):
             self.update_table_schema()
         return read_status
 
+    # 把上传的文件写入到存储引擎中
     def upload_file(self, input_file, head, job_id=None, input_feature_count=None, table=None):
         if not table:
             table = self.table
