@@ -251,7 +251,7 @@ class ZooKeeperDB(ServicesDB):
         atexit.register(self.client.stop)
 
         self.znodes_list = Queue()
-        Thread(target=self._watcher).start()
+        Thread(target=self._watcher).start()  # 创建一个线程，执行死循环，在zk上创建znode
 
     def _insert(self, service_name, service_url, value=''):
         znode = self._get_znode_path(service_name, service_url)
@@ -261,7 +261,7 @@ class ZooKeeperDB(ServicesDB):
             self.client.create(znode, value, ephemeral=True, makepath=True)
         except NodeExistsError:
             stat_logger.warning(f'Znode `{znode}` exists, add it to watch list.')
-            self.znodes_list.put((znode, value))
+            self.znodes_list.put((znode, value))  # zk上节点存在了，则把这个节点添加到znodes_list中，后续在_watcher中重试往zk添加
         except ZookeeperError as e:
             raise ZooKeeperBackendError(error_message=repr(e))
 
@@ -323,6 +323,7 @@ class ZooKeeperDB(ServicesDB):
 
     def _watcher(self):
         while True:
+            print("_watcher-loop....")
             znode, value = self.znodes_list.get()
 
             try:
