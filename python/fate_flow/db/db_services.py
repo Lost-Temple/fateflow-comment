@@ -324,21 +324,21 @@ class ZooKeeperDB(ServicesDB):
     def _watcher(self):
         while True:
             print("_watcher-loop....")
-            znode, value = self.znodes_list.get()
+            znode, value = self.znodes_list.get()  # znodes_list.get() 是有阻塞机制的，get()使用默认参数表示如果列表为空则阻塞
 
             try:
                 self.client.create(znode, value, ephemeral=True, makepath=True)
-            except NodeExistsError:
-                stat = self.client.exists(znode)
-
-                if stat is not None:
-                    if stat.owner_session_id is None:
+            except NodeExistsError:  # 创建失败，失败原因是znode已存在
+                stat = self.client.exists(znode)  # 重新查一下这个节点是否存在，主要目的是可以或取stat，里面包含了更多有用信息
+                # 这里有个问题就是多flow的情况下，会产生问题，就是一直往zk上创建znode，但一直创建失败，因为znode已经存在
+                if stat is not None:  # 如果节点存在
+                    if stat.owner_session_id is None:  # 查一下这个结点所属会话的ID，如果是None，表示这个节点是一个永久节点，不跟某个会话关联，会结束本次循环
                         stat_logger.warning(f'Znode `{znode}` is not an ephemeral node.')
                         continue
-                    if stat.owner_session_id == self.client.client_id[0]:
+                    if stat.owner_session_id == self.client.client_id[0]:  # 如果这个节点是临时节点，但所属会话的ID跟本客户端的会话ID一致，那就是本客户端重复创建NODE
                         stat_logger.warning(f'Duplicate znode `{znode}`.')
                         continue
-
+                # 当创建节点时发生NodeExistsError异常，而又不属于上述两种场景的情况下，会把(znode, value) 重新添到znodes_list中去，再继续下一轮循环
                 self.znodes_list.put((znode, value))
 
 

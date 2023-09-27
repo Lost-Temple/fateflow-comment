@@ -90,6 +90,8 @@ if __name__ == '__main__':
     # 把flow server的地址保存到zk中
     RuntimeConfig.SERVICE_DB.register_flow()
     # 从数据库表t_machine_learning_model_info加载模型的信息，把节点中的所有的模型的download url保存到zk中
+    # 如果是多个flow的情况，会写入到zk上时会产生-110错误，因为znode会重复添加，然后后写入的flow会一直往zk上创建znode，但一直失败
+    # 查看FATE/FederateAI/FATE/fateflow/python/fate_flow/db/db_services.py中的_watcher
     RuntimeConfig.SERVICE_DB.register_models()
     # component相关
     ComponentRegistry.load()  # 先从配置文件中读取需要注册的组件的信息，并且会从数据库中读取组件提供者信息，组件信息等
