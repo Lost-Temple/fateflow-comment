@@ -95,9 +95,9 @@ class Writer(ComponentBase):
                 name,
                 namespace,
                 entity_info={
-                    "have_parent": True,
-                    "parent_table_namespace": namespace,
-                    "parent_table_name": name,
+                    "have_parent": True,  # 原表就为父表
+                    "parent_table_namespace": namespace,  # 父表命名空间
+                    "parent_table_name": name,  # 父表名称
                     "job_id": self.tracker.job_id,
                 }
             )
