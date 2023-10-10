@@ -167,11 +167,11 @@ class WorkerManager:
         config = task_parameters.to_dict()
         config["src_user"] = kwargs.get("src_user")
         env = cls.get_env(task.f_job_id, task.f_provider_info)
-        if executable:
+        if executable:  # 如果有指定executable , process_cmd 就使用 executable中的值，比如 spark_submit 命令
             process_cmd = executable
-        else:
+        else:  # 如果没有指定executable , 那就使用 python 执行
             process_cmd = [env.get("PYTHON_ENV") or sys.executable or "python3"]
-        common_cmd = [module_file_path]
+        common_cmd = [module_file_path]  # 这里task_executor.py的路径
         common_cmd.extend(cls.generate_common_cmd(task, config_dir, config, log_dir, worker_id)[2])
         process_cmd.extend(common_cmd)
         if extra_env:

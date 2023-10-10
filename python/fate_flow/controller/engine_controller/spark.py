@@ -33,7 +33,7 @@ from fate_flow.utils.log_utils import schedule_logger
 class SparkEngine(EngineABC):
     def run(self, task: Task, run_parameters, run_parameters_path, config_dir, log_dir, cwd_dir, **kwargs):
         spark_home = ServerRegistry.FATE_ON_SPARK.get("spark", {}).get("home")
-        if not spark_home:
+        if not spark_home:  # 如果配置文件中没有配置spark.home，则使用 pyspark包的路径作为spark.home
             try:
                 import pyspark
                 spark_home = pyspark.__path__[0]
@@ -48,10 +48,11 @@ class SparkEngine(EngineABC):
         spark_submit_config = run_parameters.spark_run
 
         deploy_mode = spark_submit_config.get("deploy-mode", "client")
-        if deploy_mode not in ["client"]:
+        # 在client模式下，驱动程序直接在spark-submit进程中启动，该进程充当集群的客户端
+        if deploy_mode not in ["client"]:  # 只支持client模式
             raise ValueError(f"deploy mode {deploy_mode} not supported")
-
-        spark_submit_cmd = os.path.join(spark_home, "bin/spark-submit")  # spark-submit 工具是一个用于将Spark应用程序提交到集群上运行的命令行工具。
+        # spark-submit 工具是一个用于将Spark应用程序提交到集群或在本机上运行的命令行工具。
+        spark_submit_cmd = os.path.join(spark_home, "bin/spark-submit")
         executable = [spark_submit_cmd, f"--name={task.f_task_id}#{task.f_role}"]
         for k, v in spark_submit_config.items():
             if k != "conf":
@@ -62,13 +63,13 @@ class SparkEngine(EngineABC):
                 executable.append(f"{ck}={cv}")
         extra_env = {}
         extra_env["SPARK_HOME"] = spark_home
-        if DEPENDENT_DISTRIBUTION:
+        if DEPENDENT_DISTRIBUTION:  # 在spark是集群模式下启用
             dependence = Dependence()
             dependence.init(provider=ComponentProvider(**task.f_provider_info))
             executor_env_pythonpath, executor_python_env, driver_python_env, archives = dependence.get_task_dependence_info()
             schedule_logger(task.f_job_id).info(f"executor_env_python {executor_python_env}，"
                                                 f"driver_env_python {driver_python_env}， archives {archives}")
-            executable.append(f'--archives')
+            executable.append(f'--archives')  # 此选项用于向集群分发归档，这些归档文件可以包含应用程序所需的依赖项，例如Python虚拟环境或其它库
             executable.append(archives)
             executable.append(f'--conf')
             executable.append(f'spark.pyspark.python={executor_python_env}')

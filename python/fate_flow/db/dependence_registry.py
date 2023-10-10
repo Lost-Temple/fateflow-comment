@@ -23,11 +23,11 @@ class DependenceRegistry:
     @classmethod
     @DB.connection_context()
     def get_dependencies_storage_meta(cls, get_or_one=False, **kwargs):
-        kwargs["storage_engine"] = FateDependenceStorageEngine.HDFS.value
-        dependencies_storage_info = DependenciesStorageMeta.query(**kwargs)
-        if get_or_one:
+        kwargs["storage_engine"] = FateDependenceStorageEngine.HDFS.value  # 这里直接赋值引擎类型为HDFS
+        dependencies_storage_info = DependenciesStorageMeta.query(**kwargs)  # 这里查询的只是引擎类型为HDFS的
+        if get_or_one:  # 返回一个
             return dependencies_storage_info[0] if dependencies_storage_info else None
-        return dependencies_storage_info
+        return dependencies_storage_info  # 返回整个列表
 
     @classmethod
     @DB.connection_context()

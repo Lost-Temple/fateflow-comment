@@ -93,9 +93,10 @@ class TaskController(object):
 
             schedule_logger(job_id).info(f"use computing engine {run_parameters.computing_engine}")
             task_info["engine_conf"] = {"computing_engine": run_parameters.computing_engine}
-            backend_engine = build_engine(
+            backend_engine = build_engine(  # 根据传入的引擎类型创建对应的计算引擎对象
                 run_parameters.computing_engine,
                 task.f_is_deepspeed)
+            # 不同类型的计算引擎有它自己的run实现，多态调用
             run_info = backend_engine.run(task=task,
                                           run_parameters=run_parameters,
                                           run_parameters_path=run_parameters_path,
