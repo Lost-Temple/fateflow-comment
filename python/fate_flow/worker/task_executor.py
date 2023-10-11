@@ -179,9 +179,9 @@ class TaskExecutor(BaseTaskWorker):
             provider_interface = provider_utils.get_provider_interface(provider=component_provider)
             run_object = provider_interface.get(module_name, ComponentRegistry.get_provider_components(
                 provider_name=component_provider.name, provider_version=component_provider.version)).get_run_obj(
-                self.args.role)
+                self.args.role)  # 获取要被执行的组件
             flow_feeded_parameters.update({"table_info": input_table_list})
-            cpn_input = ComponentInput(
+            cpn_input = ComponentInput(  # 组件的输入
                 tracker=tracker_client,
                 checkpoint_manager=checkpoint_manager,
                 task_version_id=job_utils.generate_task_version_id(args.task_id, args.task_version),
@@ -383,7 +383,7 @@ class TaskExecutor(BaseTaskWorker):
                             computing_table = None
                         elif storage_table_meta:
                             LOGGER.info(f"load computing table use {task_parameters.computing_partitions}")
-                            computing_table = session.get_computing_session().load(
+                            computing_table = session.get_computing_session().load(  # 这里会从计算引擎中加载需要用于计算的数据集
                                 storage_table_meta.get_address(),
                                 schema=storage_table_meta.get_schema(),
                                 partitions=task_parameters.computing_partitions)
@@ -456,11 +456,11 @@ class TaskExecutor(BaseTaskWorker):
         if ERROR_REPORT:
             _error = ""
             etype, value, tb = sys.exc_info()
-            path_list = os.getenv("PYTHONPATH").split(":")
+            path_list = os.getenv("PYTHONPATH").split(":")  # 取环境变量PYTHONPATH的值，然后按：分割存入path_list(保存敏感路径）
             for line in traceback.TracebackException(type(value), value, tb).format(chain=True):
-                if not ERROR_REPORT_WITH_PATH:
+                if not ERROR_REPORT_WITH_PATH:  # 在错误报告中是否显示路径信息
                     for path in path_list:
-                        line = line.replace(path, "xxx")
+                        line = line.replace(path, "xxx")  # 把在path_list中的那些路径替换为xxx（这里应该是出于安全考虑）
                 line = replace_ip(line)
                 _error += line
             self.report_info["error_report"] = _error.rstrip("\n")
