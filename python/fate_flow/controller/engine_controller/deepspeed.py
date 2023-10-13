@@ -107,7 +107,7 @@ class EggrollDeepspeedEngine(EngineABC, ABC):
         os.makedirs(conf_dir, exist_ok=True)
         process_cmd = [
             sys.executable or 'python3',
-            sys.modules[Submit.__module__].__file__,
+            sys.modules[Submit.__module__].__file__,  # 调用 FATE/fateflow/python/fate_flow/utils/deepspeed_utils.py
             '--job_id', task.f_job_id,
             '--role', task.f_role,
             '--party_id', task.f_party_id,

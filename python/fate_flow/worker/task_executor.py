@@ -153,9 +153,9 @@ class TaskExecutor(BaseTaskWorker):
             roles = job_configuration.runtime_conf["role"]
             if set(roles) == {"local"}:
                 LOGGER.info(f"only local roles, pass init federation")
-            else:
-                if self.is_master:
-                    sess.init_federation(federation_session_id=args.federation_session_id,
+            else:  # 如果是多方任务的情况下
+                if self.is_master:  # 如果是环境变量值RANK未设置，或RANK的值为0时
+                    sess.init_federation(federation_session_id=args.federation_session_id,  # 初始化联邦消息引擎
                                          runtime_conf=component_parameters_on_party,
                                          service_conf=job_parameters.engines_address.get(EngineType.FEDERATION, {}))
             LOGGER.info(

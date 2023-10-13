@@ -21,7 +21,7 @@ from fate_flow.controller.engine_controller.spark import SparkEngine
 
 
 def build_engine(computing_engine, is_deepspeed=False):
-    if not is_deepspeed:
+    if not is_deepspeed:  # 如果非deepspeed
         if computing_engine in {ComputingEngine.EGGROLL, ComputingEngine.STANDALONE}:
             engine_session = EggrollEngine()
         elif computing_engine == ComputingEngine.SPARK:
@@ -30,7 +30,7 @@ def build_engine(computing_engine, is_deepspeed=False):
             engine_session = LinkisSparkEngine()
         else:
             raise ValueError(f"{computing_engine} is not supported")
-    else:
+    else:  # 如果是deepspeed ,目前只有EGGROLL和STANDALONE引擎支持
         if computing_engine in {ComputingEngine.EGGROLL, ComputingEngine.STANDALONE}:
             engine_session = EggrollDeepspeedEngine()
         else:
