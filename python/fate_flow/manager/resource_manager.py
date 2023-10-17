@@ -195,7 +195,7 @@ class ResourceManager(object):
 
     @classmethod
     def adapt_engine_parameters(cls, role, job_parameters: RunParameters, create_initiator_baseline=False):
-        computing_engine_info = ResourceManager.get_engine_registration_info(engine_type=EngineType.COMPUTING,
+        computing_engine_info = ResourceManager.get_engine_registration_info(engine_type=EngineType.COMPUTING,  # 从数据库中获取引擎信息
                                                                              engine_name=job_parameters.computing_engine)
         if not job_parameters.adaptation_parameters or create_initiator_baseline:
             job_parameters.adaptation_parameters = {
@@ -203,6 +203,7 @@ class ResourceManager(object):
                 "task_cores_per_node": 0,
                 "task_memory_per_node": 0,
                 # request_task_cores base on initiator and distribute to all parties, using job conf parameters or initiator fateflow server default settings
+                # 如果job_parameters中已经指定了就用，否则用默认配置，这个很重要，JOB提交时没有指定，默认使用job_default_config.yaml中的task_cores的值
                 "request_task_cores": int(job_parameters.task_cores) if job_parameters.task_cores else JobDefaultConfig.task_cores,
                 "if_initiator_baseline": True
             }
@@ -217,11 +218,11 @@ class ResourceManager(object):
             job_parameters.adaptation_parameters["if_initiator_baseline"] = False
         adaptation_parameters = job_parameters.adaptation_parameters
 
-        if job_parameters.computing_engine in {ComputingEngine.STANDALONE, ComputingEngine.EGGROLL}:
-            adaptation_parameters["task_nodes"] = computing_engine_info.f_nodes
-            if int(job_parameters.eggroll_run.get("eggroll.session.processors.per.node", 0)) > 0:
+        if job_parameters.computing_engine in {ComputingEngine.STANDALONE, ComputingEngine.EGGROLL}:  # 计算引擎是STANDALONE或者EGGROLL
+            adaptation_parameters["task_nodes"] = computing_engine_info.f_nodes  # 节点数，来源为数据库中的数据（t_engine_registry表中的数据）
+            if int(job_parameters.eggroll_run.get("eggroll.session.processors.per.node", 0)) > 0:  # JOB提交时已经在运行配置中指定了，那就直接获取值
                 adaptation_parameters["task_cores_per_node"] = int(job_parameters.eggroll_run["eggroll.session.processors.per.node"])
-            else:
+            else:  # 如果在运行配置文件中没有指定，那就计算这个 task_cores_per_node = max(1, request_task_cores/task_nodes)
                 adaptation_parameters["task_cores_per_node"] = max(1, int(adaptation_parameters["request_task_cores"] / adaptation_parameters["task_nodes"]))
             if not create_initiator_baseline:
                 # set the adaptation parameters to the actual engine operation parameters

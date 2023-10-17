@@ -383,7 +383,7 @@ class TaskExecutor(BaseTaskWorker):
                             computing_table = None
                         elif storage_table_meta:
                             LOGGER.info(f"load computing table use {task_parameters.computing_partitions}")
-                            computing_table = session.get_computing_session().load(  # 这里会从计算引擎中加载需要用于计算的数据集
+                            computing_table = session.get_computing_session().load(  # 这里会从存储引擎中加载需要用于计算的数据集
                                 storage_table_meta.get_address(),
                                 schema=storage_table_meta.get_schema(),
                                 partitions=task_parameters.computing_partitions)

@@ -168,11 +168,11 @@ class JobController(object):
         ResourceManager.adapt_engine_parameters(
             role=role, job_parameters=job_parameters, create_initiator_baseline=create_initiator_baseline)
         if create_initiator_baseline:
-            if job_parameters.task_parallelism is None:
+            if job_parameters.task_parallelism is None:  # 每个作业的任务并行度
                 job_parameters.task_parallelism = JobDefaultConfig.task_parallelism
             if job_parameters.federated_status_collect_type is None:
                 job_parameters.federated_status_collect_type = JobDefaultConfig.federated_status_collect_type
-        if create_initiator_baseline and not job_parameters.computing_partitions:
+        if create_initiator_baseline and not job_parameters.computing_partitions:  # 计算引擎分区数默认是 task_cores_per_node * task_nodes
             job_parameters.computing_partitions = job_parameters.adaptation_parameters[
                 "task_cores_per_node"] * job_parameters.adaptation_parameters["task_nodes"]
 

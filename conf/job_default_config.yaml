@@ -2,11 +2,21 @@
 default_component_provider_path: federatedml
 
 # resource
-total_cores_overweight_percent: 1  # 1 means no overweight
+# 总资源超配百分比
+total_cores_overweight_percent: 1  # 1 means no overweight，在资源管理中计算总核心数时，cores = cores_per_node * nodes * total_cores_overweight_percent
 total_memory_overweight_percent: 1  # 1 means no overweight
+# 默认的每个作业的任务并行度，可以在提交作业配置时使用job_parameters:task_parallelism配置自定义值
 task_parallelism: 1
+# 默认的每个作业中每个任务使用的CPU核数，可以在提交作业配置时使用job_parameters:task_cores配置自定义值
+# 如果在提交作业配置中没有指定，那就把下面配置的task_cores的值赋给request_task_cores
+# 然后通过数据库表t_engine_registry表中的数据得到task_nodes（表示多少个计算节点）
+# 然后通过然后通过计算公式task_cores_per_node = max(1, request_task_cores/task_nodes)得到task_cores_per_node
+# 后续computing_partitions 可以根据 task_cores_per_node * task_nodes 得到。这个computing_partitions的值就是后续
+# 计算引擎分布式计算的并行数
 task_cores: 4
+# 暂时不支持内存资源的调度，该配置不生效
 task_memory: 0  # mb
+# 一个作业最大允许申请的CPU核数占总资源数量的比例，如总资源为10，此值为0.5，则表示一个作业最多允许申请5个CPU，也即task_cores * task_parallelism <= 10 * 0.5
 max_cores_percent_per_job: 1  # 1 means total
 
 # scheduling
