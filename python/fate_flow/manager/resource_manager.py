@@ -89,7 +89,7 @@ class ResourceManager(object):
         max_cores_per_job = math.floor(engines_info[EngineType.COMPUTING].f_cores * JobDefaultConfig.max_cores_percent_per_job) \
             if engines_info.get(EngineType.COMPUTING) else 0
 
-        if cores > max_cores_per_job:
+        if cores > max_cores_per_job:  # 通过计算得出如果job申请的核心数比每个job最大核心数要大，那么申请失败
             return False, cores, max_cores_per_job
         return True, cores, max_cores_per_job
 

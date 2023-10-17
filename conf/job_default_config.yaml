@@ -6,6 +6,7 @@ default_component_provider_path: federatedml
 total_cores_overweight_percent: 1  # 1 means no overweight，在资源管理中计算总核心数时，cores = cores_per_node * nodes * total_cores_overweight_percent
 total_memory_overweight_percent: 1  # 1 means no overweight
 # 默认的每个作业的任务并行度，可以在提交作业配置时使用job_parameters:task_parallelism配置自定义值
+# 在Flow中用于计算job申请的cores等信息，判断申请的资源是否超过单个job使用资源的上限
 task_parallelism: 1
 # 默认的每个作业中每个任务使用的CPU核数，可以在提交作业配置时使用job_parameters:task_cores配置自定义值
 # 如果在提交作业配置中没有指定，那就把下面配置的task_cores的值赋给request_task_cores
