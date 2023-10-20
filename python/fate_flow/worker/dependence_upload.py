@@ -85,9 +85,12 @@ class DependenceUpload(BaseWorker):
             if os.path.exists(os.path.dirname(python_base_dir)):
                 shutil.rmtree(os.path.dirname(python_base_dir))  # 如果存在了，就先删除掉
             for key, path in fate_code_dependencies.items():
-                cls.copy_dir(path, os.path.join(python_base_dir, key))  # 重新拷贝依赖到指定目录
+                cls.copy_dir(path, os.path.join(python_base_dir, key))  # 重新拷贝依赖到指定目录,python_base_dir重新被创建
                 if key == "conf":
-                    cls.move_dir(os.path.join(python_base_dir, key), os.path.dirname(fate_code_base_dir))  # TODO 这里有bug, move_dir -> copy_tree
+                    # 这里有bug, move_dir -> copy_tree
+                    # cls.move_dir(os.path.join(python_base_dir, key), os.path.dirname(fate_code_base_dir))
+                    shutil.copytree(os.path.join(python_base_dir, key),
+                                    os.path.join(os.path.dirname(fate_code_base_dir), key), dirs_exist_ok=True)
             if provider.name == ComponentProviderName.FATE.value:
                 source_path = provider.path
             else:
