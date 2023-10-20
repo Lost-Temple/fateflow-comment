@@ -48,7 +48,7 @@ def upload_except_exit(func):
                 "f_version": provider.version,
                 "f_upload_status": False
             }
-            DependenceRegistry.save_dependencies_storage_meta(storage_meta)
+            DependenceRegistry.save_dependencies_storage_meta(storage_meta)  # 把依赖元数据存入到数据库中
             raise e
     return _wrapper
 
@@ -64,7 +64,7 @@ class DependenceUpload(BaseWorker):
     def upload_dependencies_to_hadoop(cls, provider, dependence_type, storage_engine=FateDependenceStorageEngine.HDFS.value):
         LOGGER.info(f'upload {dependence_type} dependencies to hadoop')
         LOGGER.info(f'dependencies loading ...')
-        if dependence_type == FateDependenceName.Python_Env.value:
+        if dependence_type == FateDependenceName.Python_Env.value:  # 上传的是python环境
             # todo: version python env
             target_file = os.path.join(FATE_VERSION_DEPENDENCIES_PATH, provider.version, "python_env.tar.gz")
             venv_pack_path = os.path.join(os.getenv("VIRTUAL_ENV"), "bin/venv-pack")
@@ -73,21 +73,21 @@ class DependenceUpload(BaseWorker):
             cls.rewrite_pyvenv_cfg(os.path.join(os.getenv("VIRTUAL_ENV"), "pyvenv.cfg"), "python_env")
             dependencies_conf = {"executor_python": f"./{dependence_type}/bin/python",
                                  "driver_python": f"{os.path.join(os.getenv('VIRTUAL_ENV'), 'bin', 'python')}"}
-        else:
+        else:  # 上传的是fate 代码
             fate_code_dependencies = {
-                "fate_flow": get_fate_flow_python_directory("fate_flow"),
-                "fate_arch": file_utils.get_fate_python_directory("fate_arch"),
-                "conf": file_utils.get_project_base_directory("conf")
+                "fate_flow": get_fate_flow_python_directory("fate_flow"),  # FATE/fateflow/python/fate_flow
+                "fate_arch": file_utils.get_fate_python_directory("fate_arch"),  # FATE/python/fate_arch
+                "conf": file_utils.get_project_base_directory("conf")  # FATE/conf
             }
-            fate_flow_snapshot_time = DependenceRegistry.get_modify_time(fate_code_dependencies["fate_flow"])
+            fate_flow_snapshot_time = DependenceRegistry.get_modify_time(fate_code_dependencies["fate_flow"])  # 获取fate_flow文件夹的修改时间
             fate_code_base_dir = os.path.join(FATE_VERSION_DEPENDENCIES_PATH, provider.version, "fate_code", "fate")
             python_base_dir = os.path.join(fate_code_base_dir, "python")
             if os.path.exists(os.path.dirname(python_base_dir)):
-                shutil.rmtree(os.path.dirname(python_base_dir))
+                shutil.rmtree(os.path.dirname(python_base_dir))  # 如果存在了，就先删除掉
             for key, path in fate_code_dependencies.items():
-                cls.copy_dir(path, os.path.join(python_base_dir, key))
+                cls.copy_dir(path, os.path.join(python_base_dir, key))  # 重新拷贝依赖到指定目录
                 if key == "conf":
-                    cls.move_dir(os.path.join(python_base_dir, key), os.path.dirname(fate_code_base_dir))
+                    cls.move_dir(os.path.join(python_base_dir, key), os.path.dirname(fate_code_base_dir))  # TODO 这里有bug, move_dir -> copy_tree
             if provider.name == ComponentProviderName.FATE.value:
                 source_path = provider.path
             else:

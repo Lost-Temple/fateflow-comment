@@ -53,7 +53,7 @@ class WorkerManager:
                 module = ProviderRegistrar
                 module_file_path = sys.modules[ProviderRegistrar.__module__].__file__
                 specific_cmd = []
-            elif worker_name == WorkerName.DEPENDENCE_UPLOAD:
+            elif worker_name == WorkerName.DEPENDENCE_UPLOAD:  # 这里是上传依赖到存储引擎中去，可以让spark计算引擎的worker节点获取到这些依赖
                 from fate_flow.worker.dependence_upload import DependenceUpload
                 module = DependenceUpload
                 module_file_path = sys.modules[DependenceUpload.__module__].__file__

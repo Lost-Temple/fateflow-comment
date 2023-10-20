@@ -119,8 +119,8 @@ class DependenceManager:
             version_provider_info = fate_flow_version_provider_info
         check_tag, upload_tag, upload_details = cls.check_upload(job.f_job_id, version_provider_info,
                                                                  fate_flow_version_provider_info)
-        if upload_tag:
-            cls.upload_spark_dependence(job, upload_details)
+        if upload_tag:  # 检查是否需要上传依赖
+            cls.upload_spark_dependence(job, upload_details)  # 上传依赖
         return check_tag
 
     @classmethod
