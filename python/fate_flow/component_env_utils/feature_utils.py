@@ -37,7 +37,14 @@ def get_component_output_data_line(src_key, src_value, schema=None, all_extend_h
                 data_line.append(None)
         data_line.extend(dataset_to_list(src_value.features))
     elif isinstance(src_value, str):
-        data_line.extend([value for value in src_value.split(',')])
+        delimiter = ","
+        if schema:
+            meta = schema.get("meta")
+            if meta:
+                _delimiter = meta.get("delimiter")
+                if _delimiter:
+                    delimiter = meta.get("delimiter")
+        data_line.extend([value for value in src_value.split(delimiter)])
         is_str = True
     else:
         data_line.extend(dataset_to_list(src_value))
