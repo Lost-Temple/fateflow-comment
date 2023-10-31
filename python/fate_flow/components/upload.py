@@ -278,7 +278,7 @@ class Upload(ComponentBase):
             "partitions": self.parameters["partition"],
             "extend_sid": self.parameters["extend_sid"]
         }
-        if self.parameters.get("with_meta"):
+        if self.parameters.get("with_meta"):  # 这里是 with_meta 为真时
             metas_info.update({"schema": self.generate_anonymous_schema()})
         self.table.meta.update_metas(**metas_info)
         self.save_meta(  # 这里是 log_output_data_info/log_metric_data/set_metric_meta
