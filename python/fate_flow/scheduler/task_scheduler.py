@@ -85,7 +85,7 @@ class TaskScheduler(object):
                 else:
                     # all upstream dependent tasks have been successful, can start this task
                     scheduling_status_code = SchedulingStatusCode.HAVE_NEXT
-                    status_code = cls.start_task(job=job, task=waiting_task)
+                    status_code = cls.start_task(job=job, task=waiting_task)  # 来了，注意这里
                     if status_code == SchedulingStatusCode.NO_RESOURCE:
                         # wait for the next round of scheduling
                         schedule_logger(job.f_job_id).info(f"task {waiting_task.f_task_id} can not apply resource, wait for the next round of scheduling")
@@ -100,13 +100,15 @@ class TaskScheduler(object):
         schedule_logger(job.f_job_id).info("finish scheduling job tasks")
         return scheduling_status_code, auto_rerun_tasks, initiator_tasks_group.values()
 
+    # 真正开始准备执行task
     @classmethod
     def start_task(cls, job, task):
         schedule_logger(task.f_job_id).info("try to start task {} {} on {} {}".format(task.f_task_id, task.f_task_version, task.f_role, task.f_party_id))
+        # 申请作业所需要的计算资源
         apply_status = ResourceManager.apply_for_task_resource(task_info=task.to_human_model_dict(only_primary_with=["status"]))
-        if not apply_status:
+        if not apply_status:  # 申请失败
             return SchedulingStatusCode.NO_RESOURCE
-        task.f_status = TaskStatus.RUNNING
+        task.f_status = TaskStatus.RUNNING  # 把任务状态改为运行中
         update_status = JobSaver.update_task_status(task_info=task.to_human_model_dict(only_primary_with=["status"]))
         if not update_status:
             # Another scheduler scheduling the task
@@ -117,7 +119,7 @@ class TaskScheduler(object):
             return SchedulingStatusCode.PASS
         schedule_logger(task.f_job_id).info("start task {} {} on {} {}".format(task.f_task_id, task.f_task_version, task.f_role, task.f_party_id))
         FederatedScheduler.sync_task_status(job=job, task=task)
-        status_code, response = FederatedScheduler.start_task(job=job, task=task)
+        status_code, response = FederatedScheduler.start_task(job=job, task=task)  # 就是这里，执行task
         if status_code == FederatedSchedulingStatusCode.SUCCESS:
             return SchedulingStatusCode.SUCCESS
         else:
