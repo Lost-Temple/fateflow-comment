@@ -176,10 +176,10 @@ class TaskExecutor(BaseTaskWorker):
             # LOGGER.info(f"task input args {task_run_args}")
 
             need_run = component_parameters_on_party.get("ComponentParam", {}).get("need_run", True)
-            provider_interface = provider_utils.get_provider_interface(provider=component_provider)
+            provider_interface = provider_utils.get_provider_interface(provider=component_provider)  # 这里返回的是一个provider, 比如 fate_flow
             run_object = provider_interface.get(module_name, ComponentRegistry.get_provider_components(
                 provider_name=component_provider.name, provider_version=component_provider.version)).get_run_obj(
-                self.args.role)  # 获取要被执行的组件
+                self.args.role)  # 获取要被执行的组件, 比如：fate_flow.components.upload.Upload
             flow_feeded_parameters.update({"table_info": input_table_list})
             cpn_input = ComponentInput(  # 组件的输入
                 tracker=tracker_client,
@@ -209,12 +209,12 @@ class TaskExecutor(BaseTaskWorker):
                 # add profile logs
                 LOGGER.info("profile logging is enabled")
                 profile.profile_start()
-                cpn_output = run_object.run(cpn_input)
+                cpn_output = run_object.run(cpn_input)  # 执行组件的run方法
                 sess.wait_remote_all_done()
                 profile.profile_ends()
             else:
                 LOGGER.info("profile logging is disabled")
-                cpn_output = run_object.run(cpn_input)
+                cpn_output = run_object.run(cpn_input)  # 执行组件的run方法
                 sess.wait_remote_all_done()
 
             LOGGER.info(f"task output dsl {task_output_dsl}")

@@ -183,7 +183,7 @@ class Upload(ComponentBase):
         sess = Session.get_global()
         self.session = sess
         if self.parameters.get("destroy", False):  # 如果是带了drop参数值为1的情况, 客户端请求中传过来的是drop参数，fate_flow把这个参数用destroy来代替了
-            table = sess.get_table(namespace=namespace, name=name)
+            table = sess.get_table(namespace=namespace, name=name)  # 这里的table对类型具体存储引擎下的_table.StorageTable。比如：fate_arch.storage.standalone._table.StorageTable
             if table:
                 LOGGER.info(
                     f"destroy table name: {name} namespace: {namespace} engine: {table.engine}"

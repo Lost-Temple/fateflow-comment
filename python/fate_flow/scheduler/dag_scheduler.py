@@ -51,10 +51,10 @@ class DAGScheduler(Cron):
         schedule_logger(job_id).info(f"submit job, body {submit_job_conf.to_dict()}")
         try:
             dsl = submit_job_conf.dsl
-            runtime_conf = deepcopy(submit_job_conf.runtime_conf)
+            runtime_conf = deepcopy(submit_job_conf.runtime_conf)  # runtime_conf 就是http post请求体中的job_runtime_conf
             job_utils.check_job_conf(runtime_conf, dsl)
             job_initiator = runtime_conf["initiator"]
-            conf_adapter = JobRuntimeConfigAdapter(runtime_conf)
+            conf_adapter = JobRuntimeConfigAdapter(runtime_conf)  # 配置适配器，DSL版本不同，runtime_conf会有所有不同
             common_job_parameters = conf_adapter.get_common_parameters()
             common_job_parameters.roles = runtime_conf["role"]
             common_job_parameters.role_parameters = runtime_conf.get("job_parameters", {}).get("role", {})
@@ -67,7 +67,7 @@ class DAGScheduler(Cron):
                 # 生成模型id
                 common_job_parameters.model_id = model_utils.gen_model_id(runtime_conf["role"])
                 common_job_parameters.model_version = job_id  # 把job_id 赋给model_version ???
-                train_runtime_conf = {}
+                train_runtime_conf = {}  # 如果是训练，train_runtime_conf 为 {}
             else:  # job_type 是predict的分支
                 # check predict job parameters # 检查参数
                 detect_utils.check_config(common_job_parameters.to_dict(), ["model_id", "model_version"])
@@ -91,7 +91,7 @@ class DAGScheduler(Cron):
                     raise Exception(f"model has not been deployed yet")
 
                 pipeline_model = tracker.pipelined_model.read_pipeline_model()
-                train_runtime_conf = json_loads(pipeline_model.train_runtime_conf)
+                train_runtime_conf = json_loads(pipeline_model.train_runtime_conf)  # 如果是预测，会有train_runtime_conf
                 dsl = json_loads(pipeline_model.inference_dsl)
 
             job = Job()
@@ -126,8 +126,8 @@ class DAGScheduler(Cron):
                                                            train_runtime_conf=job.f_train_runtime_conf)
 
             # initiator runtime conf as template
-            job.f_runtime_conf_on_party = job.f_runtime_conf.copy()
-            job.f_runtime_conf_on_party["job_parameters"] = common_job_parameters.to_dict()
+            job.f_runtime_conf_on_party = job.f_runtime_conf.copy()  # f_runtime_conf_on_party 先从 f_runtime_conf 拷贝
+            job.f_runtime_conf_on_party["job_parameters"] = common_job_parameters.to_dict()  # 再设置f_runtime_conf_on_party中的 job_parmeters的值
 
             # inherit job
             job.f_inheritance_info = common_job_parameters.inheritance_info
