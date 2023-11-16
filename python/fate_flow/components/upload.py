@@ -333,7 +333,7 @@ class Upload(ComponentBase):
     def update_schema(self, head, fp):
         read_status = False
         if head is True:
-            data_head = fp.readline()
+            data_head = fp.readline()  # 读取第1行，表头
             self.update_table_schema(data_head)
             read_status = True
         else:
@@ -371,7 +371,7 @@ class Upload(ComponentBase):
 
     def update_table_schema(self, data_head=""):
         LOGGER.info(f"data head: {data_head}")
-        schema = data_utils.get_header_schema(
+        schema = data_utils.get_header_schema(  # 这里方法内部默认第1列为sid
             header_line=data_head,
             id_delimiter=self.parameters["id_delimiter"],
             extend_sid=self.parameters["extend_sid"],

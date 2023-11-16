@@ -122,7 +122,7 @@ class TaskExecutor(BaseTaskWorker):
             self.report_info["party_status"] = TaskStatus.RUNNING
             self.report_task_info_to_driver()
 
-            previous_components_parameters = tracker_client.get_model_run_parameters()
+            previous_components_parameters = tracker_client.get_model_run_parameters()  # 获取前一个组件的参数
             LOGGER.info(f"previous_components_parameters:\n{json_dumps(previous_components_parameters, indent=4)}")
 
             component_provider, component_parameters_on_party, user_specified_parameters = \
@@ -152,7 +152,7 @@ class TaskExecutor(BaseTaskWorker):
             component_parameters_on_party["job_parameters"] = job_parameters.to_dict()
             roles = job_configuration.runtime_conf["role"]
             if set(roles) == {"local"}:
-                LOGGER.info(f"only local roles, pass init federation")
+                LOGGER.info(f"only local roles, pass init federation")  # 如果角色是local，那就不需要 init federation
             else:  # 如果是多方任务的情况下
                 if self.is_master:  # 如果是环境变量值RANK未设置，或RANK的值为0时
                     sess.init_federation(federation_session_id=args.federation_session_id,  # 初始化联邦消息引擎
@@ -162,6 +162,7 @@ class TaskExecutor(BaseTaskWorker):
                 f'run {args.component_name} {args.task_id} {args.task_version} on {args.role} {args.party_id} task')
             LOGGER.info(f"component parameters on party:\n{json_dumps(component_parameters_on_party, indent=4)}")
             LOGGER.info(f"task input dsl {task_input_dsl}")
+            # 下面的get_task_run_args会得到task运行所需要的参数，包括从存储引擎中获取计算引擎所需要的数据
             task_run_args, input_table_list = self.get_task_run_args(job_id=args.job_id, role=args.role,
                                                                      party_id=args.party_id,
                                                                      task_id=args.task_id,
@@ -384,8 +385,8 @@ class TaskExecutor(BaseTaskWorker):
                         elif storage_table_meta:
                             LOGGER.info(f"load computing table use {task_parameters.computing_partitions}")
                             computing_table = session.get_computing_session().load(  # 这里会从存储引擎中加载需要用于计算的数据集
-                                storage_table_meta.get_address(),
-                                schema=storage_table_meta.get_schema(),
+                                storage_table_meta.get_address(),  # 存储引擎地址
+                                schema=storage_table_meta.get_schema(),  # schema，元数据表（mysql数据库中的t_storage_table_meta）中记录的schema
                                 partitions=task_parameters.computing_partitions)
                             input_table_info_list.append({'namespace': storage_table_meta.get_namespace(),
                                                           'name': storage_table_meta.get_name()})

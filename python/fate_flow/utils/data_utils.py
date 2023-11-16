@@ -28,8 +28,8 @@ def get_header_schema(header_line, id_delimiter, extend_sid=False):
         header = id_delimiter.join(header_source_item).strip()
         sid = get_extend_id_name()
     else:
-        header = id_delimiter.join(header_source_item[1:]).strip()
-        sid = header_source_item[0].strip()
+        header = id_delimiter.join(header_source_item[1:]).strip()  # 取第2列开始至最后作为header, 除去第1列因为第1列是sid
+        sid = header_source_item[0].strip()  # 这里取的是第1列作为sid, 这就对数据文件有要求了
     return {'header': header, 'sid': sid}
 
 
