@@ -59,7 +59,7 @@ def write_to_db(conf, table_name, file_name, namespace, partitions, head):
         if head:
             data_head = f.readline()
             header_source_item = data_head.split(',')
-            table_meta.update_metas(schema={'header': ','.join(header_source_item[1:]).strip(), 'sid': header_source_item[0]})
+            table_meta.update_metas(schema={'header': ','.join(header_source_item[1:]).strip(), 'sid': header_source_item[0]})  # 这里直接用的是第1列作为sid
         n = 0
         count = 0
         while True:

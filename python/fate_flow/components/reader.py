@@ -305,7 +305,7 @@ class Reader(ComponentBase):
                         data_list = [[schema.get("label_name")] if schema.get("label_name") else []]
                         data_list[0].extend(headers)
                 LOGGER.info(f"data info header: {data_list[0]}")
-                for data in output_table_meta.get_part_of_data():
+                for data in output_table_meta.get_part_of_data():  # part_of_data 的数据是一个列表，这个列表元素是一个元组，元组第1个元素是sid，第二个元素是用分隔符隔开的数据
                     if isinstance(data[1], str):
                         delimiter = schema.get("meta", {}).get(
                             "delimiter") or output_table_meta.id_delimiter
@@ -323,9 +323,9 @@ class Reader(ComponentBase):
                         data_list.append(data[1])
 
                 data = np.array(data_list)
-                Tdata = data.transpose()
+                Tdata = data.transpose()  # 转置，也就是列变成行
                 for data in Tdata:
-                    table_info[data[0]] = ",".join(list(set(data[1:]))[:5])
+                    table_info[data[0]] = ",".join(list(set(data[1:]))[:5])  # 这里面会去重，比如把x0中的值去重
             if schema and schema.get("anonymous_header"):
                 anonymous_info = dict(zip(schema.get("header"), schema.get("anonymous_header")))
                 attribute_info = dict(zip(schema.get("header"), ["feature"] * len(schema.get("header"))))
