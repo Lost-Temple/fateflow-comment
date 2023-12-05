@@ -294,7 +294,7 @@ class DAGScheduler(Cron):
         if job.f_inheritance_status != JobInheritanceStatus.PASS:
             cls.check_component(job)
         schedule_logger(job_id).info("job dependence check")
-        dependence_status_code, federated_dependence_response = FederatedScheduler.dependence_for_job(job=job)
+        dependence_status_code, federated_dependence_response = FederatedScheduler.dependence_for_job(job=job)  # 这里会上传spark应用的依赖
         schedule_logger(job_id).info(f"dependence check: {dependence_status_code}, {federated_dependence_response}")
         if dependence_status_code == FederatedSchedulingStatusCode.SUCCESS:
             apply_status_code, federated_response = FederatedScheduler.resource_for_job(job=job, operation_type=ResourceOperation.APPLY)

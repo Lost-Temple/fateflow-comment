@@ -45,6 +45,7 @@ class SparkEngine(EngineABC):
         #     raise ValueError(f"spark home must be configured in conf/service_conf.yaml when run on cluster mode")
 
         # additional configs
+        # 这个在job提交时配的job_runtime_conf->job_parameters->common->spark_run下配置
         spark_submit_config = run_parameters.spark_run
 
         deploy_mode = spark_submit_config.get("deploy-mode", "client")
@@ -70,7 +71,7 @@ class SparkEngine(EngineABC):
             schedule_logger(task.f_job_id).info(f"executor_env_python {executor_python_env}，"
                                                 f"driver_env_python {driver_python_env}， archives {archives}")
             executable.append(f'--archives')  # 此选项用于向集群分发归档，这些归档文件可以包含应用程序所需的依赖项，例如Python虚拟环境或其它库
-            executable.append(archives)
+            executable.append(archives)  # 指定archives 在的hdfs 中的路径
             executable.append(f'--conf')
             executable.append(f'spark.pyspark.python={executor_python_env}')
             executable.append(f'--conf')
