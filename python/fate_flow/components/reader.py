@@ -97,7 +97,7 @@ class Reader(ComponentBase):
             name=input_table_meta.get_name(), namespace=input_table_meta.get_namespace()
         )
         # update real count to meta info
-        input_table.count()
+        input_table.count()  # 读取数据，获取到它的数量， count() 内部会去更新meta信息，把数据数量按照真实值更新一下（有可能存储引擎中的数量被人为改动过了）
         # Table replication is required
         if input_table_meta.get_engine() != output_table_engine:
             LOGGER.info(
@@ -109,7 +109,7 @@ class Reader(ComponentBase):
             )
         LOGGER.info("reader create storage session2")
         output_table_session = sess.storage(storage_engine=output_table_engine)
-        output_table = output_table_session.create_table(
+        output_table = output_table_session.create_table(  # reader组件的输出表，元数据也会保存到t_storage_table_meta中
             address=output_table_address,
             name=output_table_name,
             namespace=output_table_namespace,

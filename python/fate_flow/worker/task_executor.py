@@ -225,7 +225,7 @@ class TaskExecutor(BaseTaskWorker):
             for index, data in enumerate(cpn_output.data):
                 data_name = task_output_dsl.get('data')[index] if task_output_dsl.get('data') else '{}'.format(index)
                 # todo: the token depends on the engine type, maybe in job parameters
-                persistent_table_namespace, persistent_table_name = tracker.save_output_data(
+                persistent_table_namespace, persistent_table_name = tracker.save_output_data(  # 持久化组件输出的数据表
                     computing_table=data,
                     output_storage_engine=job_parameters.storage_engine,
                     token={"username": user_name})

@@ -132,6 +132,7 @@ class Tracker(object):
                     if part_of_limit == 0:
                         break
 
+            # 把组件的输出表保存到存储引擎中，并在mysql中的t_storage_table_meta中保存元数据
             session.Session.persistent(computing_table=computing_table,
                                        namespace=output_table_namespace,
                                        name=output_table_name,
