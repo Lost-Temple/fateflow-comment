@@ -539,9 +539,9 @@ class RuntimeConfParserV2(object):
     def get_job_parameters(submit_dict):
         ret = {}
         job_parameters = submit_dict.get("job_parameters", {})
-        component_parameters = submit_dict.get("component_parameters", {})
+        component_parameters = submit_dict.get("component_parameters", {})  # component_parameters 配置
         common_job_parameters = job_parameters.get("common", {})
-        role_job_parameters = component_parameters.get("role", {})
+        role_job_parameters = component_parameters.get("role", {})  # component_parameters下的role配置
         for role in submit_dict["role"]:
             party_id_list = submit_dict["role"][role]
             if not role_job_parameters:
