@@ -110,8 +110,8 @@ class TaskExecutor(BaseTaskWorker):
                 'component_module_name': module_name,
                 'job_parameters': job_parameters,
             }
-            tracker = Tracker(**kwargs)
-            tracker_client = TrackerClient(**kwargs)
+            tracker = Tracker(**kwargs)  # 创建一个 tracker
+            tracker_client = TrackerClient(**kwargs)  # 创建一个 track_client
             checkpoint_manager = CheckpointManager(**kwargs)
 
             predict_tracker_client = None
@@ -183,7 +183,7 @@ class TaskExecutor(BaseTaskWorker):
                 self.args.role)  # 获取要被执行的组件, 比如：fate_flow.components.upload.Upload
             flow_feeded_parameters.update({"table_info": input_table_list})
             cpn_input = ComponentInput(  # 组件的输入
-                tracker=tracker_client,
+                tracker=tracker_client,  # 这里把tracker_client 传入
                 checkpoint_manager=checkpoint_manager,
                 task_version_id=job_utils.generate_task_version_id(args.task_id, args.task_version),
                 parameters=component_parameters_on_party["ComponentParam"],
