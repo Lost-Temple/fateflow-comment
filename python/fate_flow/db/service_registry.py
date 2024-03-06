@@ -63,7 +63,7 @@ class ServerRegistry(ReloadConfigBase):
     FATE_ON_STANDALONE = None
     FATE_ON_EGGROLL = None
     FATE_ON_SPARK = None
-    MODEL_STORE_ADDRESS = None
+    MODEL_STORE_ADDRESS = None  # 模型存储
     SERVINGS = None
     FATEMANAGER = None
     STUDIO = None  # 这是什么玩意？好像没用到？
