@@ -175,19 +175,19 @@ class CheckpointManager:
             raise TypeError('max_to_keep must be an integer')
         self.checkpoints = deque(maxlen=max_to_keep)
 
-    def load_checkpoints_from_disk(self):
+    def load_checkpoints_from_disk(self):  # 从磁盘加载checkpoint信息
         checkpoints = []
         for directory in self.directory.glob('*'):
             if not directory.is_dir() or '#' not in directory.name:
                 continue
 
-            step_index, step_name = directory.name.split('#', 1)
+            step_index, step_name = directory.name.split('#', 1)  # 把保存路径进行拆分得到步骤索引，步骤名
             checkpoint = Checkpoint(self.directory, int(step_index), step_name)
 
             if not checkpoint.available:
                 continue
             checkpoints.append(checkpoint)
-        # deque 是双端队列
+        # deque 是双端队列，可以在队列的两端添加或删除元素，效率较高，并且线程安全
         self.checkpoints = deque(sorted(checkpoints, key=lambda i: i.step_index), self.max_checkpoints_number)
 
     @property

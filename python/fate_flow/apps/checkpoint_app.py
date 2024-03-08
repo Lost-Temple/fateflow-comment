@@ -33,13 +33,13 @@ def load_checkpoints():
 
 
 @manager.route('/list', methods=['POST'])
-def list_checkpoints():
+def list_checkpoints():  # 加载checkpoint列表
     checkpoint_manager = load_checkpoints()
     return get_json_result(data=checkpoint_manager.to_dict())
 
 
 @manager.route('/get', methods=['POST'])
-def get_checkpoint():
+def get_checkpoint():  # 根据 step_index 或 step_name 获取 checkpoint
     checkpoint_manager = load_checkpoints()
 
     if 'step_index' in request.json:
