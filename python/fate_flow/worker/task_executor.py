@@ -97,22 +97,22 @@ class TaskExecutor(BaseTaskWorker):
             model_version = job_parameters.model_version if job_parameters.job_type != 'predict' else args.job_id
 
             kwargs = {
-                'job_id': args.job_id,
-                'role': args.role,
-                'party_id': args.party_id,
-                'component_name': args.component_name,
-                'task_id': args.task_id,
-                'task_version': args.task_version,
-                'model_id': job_parameters.model_id,
+                'job_id': args.job_id,  # 如：'202403081705316262700'
+                'role': args.role,  # 如：'guest'
+                'party_id': args.party_id,  # 如：'9999'
+                'component_name': args.component_name,  # 如：'reader_0'
+                'task_id': args.task_id,  # 如：'202403081705316262700_reader_0'
+                'task_version': args.task_version,  # 如：'0'
+                'model_id': job_parameters.model_id,  # 如：'arbiter-10000#guest-9999#host-10000#model'
                 # in the prediction job, job_parameters.model_version comes from the training job
                 # TODO: prediction job should not affect training job
-                'model_version': job_parameters.model_version,
-                'component_module_name': module_name,
+                'model_version': job_parameters.model_version,  # 如：'202403081705316262700'
+                'component_module_name': module_name,  # 如：'Reader'
                 'job_parameters': job_parameters,
             }
             tracker = Tracker(**kwargs)  # 创建一个 tracker
             tracker_client = TrackerClient(**kwargs)  # 创建一个 track_client
-            checkpoint_manager = CheckpointManager(**kwargs)
+            checkpoint_manager = CheckpointManager(**kwargs)  # 创建一个checkpoint 管理器
 
             predict_tracker_client = None
             if job_parameters.job_type == 'predict':
@@ -184,7 +184,7 @@ class TaskExecutor(BaseTaskWorker):
             flow_feeded_parameters.update({"table_info": input_table_list})
             cpn_input = ComponentInput(  # 组件的输入
                 tracker=tracker_client,  # 这里把tracker_client 传入
-                checkpoint_manager=checkpoint_manager,
+                checkpoint_manager=checkpoint_manager,  # checkpoint管理器
                 task_version_id=job_utils.generate_task_version_id(args.task_id, args.task_version),
                 parameters=component_parameters_on_party["ComponentParam"],
                 datasets=task_run_args.get("data", None),

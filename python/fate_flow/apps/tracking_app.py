@@ -163,7 +163,7 @@ def component_output_model():
     # There is only one model output at the current dsl version.
     model_alias = next(iter(define_meta['model_proto'][request_data['component_name']].keys()))
 
-    if ENABLE_MODEL_STORE:
+    if ENABLE_MODEL_STORE:  # 如果启用了模型的远端存储
         sync_component = SyncComponent(
             role=request_data['role'],
             party_id=request_data['party_id'],
@@ -171,8 +171,8 @@ def component_output_model():
             model_version=model_version,
             component_name=request_data['component_name'],
         )
-        if not sync_component.local_exists() and sync_component.remote_exists():
-            sync_component.download()
+        if not sync_component.local_exists() and sync_component.remote_exists():  # 本地没缓存，远端存在
+            sync_component.download()  # 下载到本地
 
     output_model = tracker.pipelined_model.read_component_model(
         component_name=request_data['component_name'],

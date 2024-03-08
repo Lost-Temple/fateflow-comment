@@ -45,8 +45,8 @@ class TrackerClient(object):
         self.party_id = party_id
         self.model_id = model_id
         self.model_version = model_version
-        self.component_name = component_name if component_name else 'pipeline'  # 如果是系统内置组件，就用组件名，否则用pipeline(首字母小写)
-        self.module_name = component_module_name if component_module_name else 'Pipeline'  # 如果是系统内置组件，就用组件的模块名，否则为Pipeline(首字母大写）
+        self.component_name = component_name if component_name else 'pipeline'  # 如果component_name不为空，就用component_name，否则用pipeline(首字母小写)
+        self.module_name = component_module_name if component_module_name else 'Pipeline'  # 如果component_module_name不为空，就用component_module_name，否则为Pipeline(首字母大写）
         self.task_id = task_id
         self.task_version = task_version
         self.job_parameters = job_parameters

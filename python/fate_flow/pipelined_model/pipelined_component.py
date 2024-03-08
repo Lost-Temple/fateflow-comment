@@ -41,7 +41,7 @@ class PipelinedComponent(Pipelined, Locker):
         self.run_parameters_path = self.model_path / 'run_parameters'
         self.checkpoint_path = self.model_path / 'checkpoint'
 
-        self.query_args = (
+        self.query_args = (  # 把条件语句放在元组中，后续作为筛选条件
             PipelineComponentMeta.f_model_id == self.model_id,
             PipelineComponentMeta.f_model_version == self.model_version,
             PipelineComponentMeta.f_role == self.role,
@@ -119,9 +119,10 @@ class PipelinedComponent(Pipelined, Locker):
         return define_meta
 
     def get_define_meta(self):
-        query = self.get_define_meta_from_db()
+        query = self.get_define_meta_from_db()  # 从表t_pipeline_component_meta中查询
         return self.rearrange_define_meta(query) if query else self.get_define_meta_from_file()
 
+    # 把数据保存到表t_pipeline_component_meta中
     @DB.connection_context()
     def save_define_meta(self, component_name, component_module_name, model_alias, model_proto_index, run_parameters):
         PipelineComponentMeta.insert(

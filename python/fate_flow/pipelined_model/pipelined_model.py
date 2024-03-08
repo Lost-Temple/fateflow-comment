@@ -112,7 +112,7 @@ class PipelinedModel(Locker):
             with open(f"{storage_path}.json", "w", encoding="utf8") as fw:
                 fw.write(json_dumps(object_json))
 
-        self.pipelined_component.save_define_meta(
+        self.pipelined_component.save_define_meta(  # 把数据保存到表t_pipeline_component_meta中
             component_model["component_name"], component_model["component_module_name"],
             component_model["model_alias"], component_model["model_proto_index"],
             component_model.get("run_parameters") or {},
