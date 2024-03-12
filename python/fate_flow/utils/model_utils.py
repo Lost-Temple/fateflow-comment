@@ -105,7 +105,7 @@ def query_model_info_from_file(model_id='*', model_version='*', role='*', party_
 
         if save_to_db:
             try:
-                save_model_info(model_info)
+                save_model_info(model_info)  # 保存模型信息到t_machine_learning_model_info，并把模型同步到远程存储（由ENABLE_MODEL_STORE决定）
             except Exception as e:
                 stat_logger.exception(e)
 
@@ -203,15 +203,15 @@ def query_model_info(**kwargs):
 def save_model_info(model_info):
     model_info = {k if k.startswith('f_') else f'f_{k}': v for k, v in model_info.items()}
 
-    with DB.connection_context():
+    with DB.connection_context():  # 插入到t_machine_learning_model_info表中
         MLModel.insert(**model_info).on_conflict(preserve=(
             'f_update_time',
             'f_update_date',
             *model_info.keys(),
         )).execute()
 
-    if ENABLE_MODEL_STORE:
-        sync_model = SyncModel(
+    if ENABLE_MODEL_STORE:  # 如果启用了远程模型存储
+        sync_model = SyncModel(  # 把本地模型缓存同步到远程存储
             role=model_info['f_role'], party_id=model_info['f_party_id'],
             model_id=model_info['f_model_id'], model_version=model_info['f_model_version'],
         )

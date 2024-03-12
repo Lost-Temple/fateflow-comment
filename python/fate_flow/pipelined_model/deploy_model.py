@@ -42,7 +42,7 @@ def deploy(config_data):
     warning_msg = ""
 
     try:
-        if ENABLE_MODEL_STORE:
+        if ENABLE_MODEL_STORE:  # 判断是否启用远程缓存
             sync_model = SyncModel(
                 role=local_role, party_id=local_party_id,
                 model_id=model_id, model_version=model_version,

@@ -74,7 +74,7 @@ def get_table_meta(job_id, component_name, task_version, task_id, role, party_id
                methods=['POST'])
 @manager.route('/<job_id>/<component_name>/<task_id>/<task_version>/<role>/<party_id>/component_model/save',
                methods=['POST'])
-@validate_request('model_id', 'model_version', 'component_model')
+@validate_request('model_id', 'model_version', 'component_model')  # 存储模型
 def save_component_model(job_id, component_name, task_version, task_id, role, party_id):
     party_model_id = gen_party_model_id(request.json['model_id'], role, party_id)
     model_version = request.json['model_version']
@@ -82,14 +82,14 @@ def save_component_model(job_id, component_name, task_version, task_id, role, pa
     pipelined_model = PipelinedModel(party_model_id, model_version)
     pipelined_model.write_component_model(request.json['component_model'])
 
-    if ENABLE_MODEL_STORE:
+    if ENABLE_MODEL_STORE:  # 是否启用远程存储
         sync_component = SyncComponent(
             party_model_id=party_model_id,
             model_version=model_version,
             component_name=component_name,
         )
         # no need to test sync_component.remote_exists()
-        sync_component.upload()
+        sync_component.upload()  # 上传到远程存储
 
     return get_json_result()
 

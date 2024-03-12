@@ -236,11 +236,11 @@ class TaskExecutor(BaseTaskWorker):
                     output_table_list.append({"namespace": persistent_table_namespace, "name": persistent_table_name})
             self.log_output_data_table_tracker(args.job_id, input_table_list, output_table_list)
 
-            if cpn_output.model and self.is_master:
-                getattr(
+            if cpn_output.model and self.is_master:  # cpn_output.model 会序列化数据
+                getattr(  # 这里获取tracker_client对象中的save_component_output_model函数 并调用它
                     tracker_client if predict_tracker_client is None else predict_tracker_client,
                     'save_component_output_model',
-                )(
+                )(  # 调用 save_component_output_model ，下面是它的参数列表
                     model_buffers=cpn_output.model,
                     # There is only one model output at the current dsl version
                     model_alias=task_output_dsl['model'][0] if task_output_dsl.get('model') else 'default',
