@@ -135,10 +135,10 @@ def check_job_conf(runtime_conf, job_dsl):
     detect_utils.check_config(runtime_conf, ['initiator', 'role'])
     detect_utils.check_config(runtime_conf['initiator'], ['role', 'party_id'])
     # deal party id
-    runtime_conf['initiator']['party_id'] = int(runtime_conf['initiator']['party_id'])
+    runtime_conf['initiator']['party_id'] = int(runtime_conf['initiator']['party_id'])  # 这里如果party_id 如果非整型，则强转一下
     for r in runtime_conf['role'].keys():
         for i in range(len(runtime_conf['role'][r])):
-            runtime_conf['role'][r][i] = int(runtime_conf['role'][r][i])
+            runtime_conf['role'][r][i] = int(runtime_conf['role'][r][i])  # 这里也是把不同角色对应的party_id转成整型
     constraint_check(runtime_conf, job_dsl)
 
 
@@ -420,13 +420,13 @@ def get_job_all_components(dsl):
 
 def constraint_check(job_runtime_conf, job_dsl):
     if job_dsl:
-        all_components = get_job_all_components(job_dsl)
-        glm = ['heterolr', 'heterolinr', 'heteropoisson']
+        all_components = get_job_all_components(job_dsl)  # 获取job中所有的组件
+        glm = ['heterolr', 'heterolinr', 'heteropoisson']  # 需要进行约束检查的组件集
         for cpn in glm:
-            if cpn in all_components:
-                roles = job_runtime_conf.get('role')
-                if 'guest' in roles.keys() and 'arbiter' in roles.keys() and 'host' in roles.keys():
-                    for party_id in set(roles['guest']) & set(roles['arbiter']):
+            if cpn in all_components:  # 如果job的组件列表中存在需要做约束检查的组件
+                roles = job_runtime_conf.get('role')  # 如： {'arbiter': [10000], 'guest': [9999], 'host': [10000]}
+                if 'guest' in roles.keys() and 'arbiter' in roles.keys() and 'host' in roles.keys():  # job需要guest/host/arbiter三类角色共同参与
+                    for party_id in set(roles['guest']) & set(roles['arbiter']):  # 把roles['guest']和roles['arbiter']转换成set后求交集
                         if party_id not in roles['host'] or len(set(roles['guest']) & set(roles['arbiter'])) != len(roles['host']):
                             raise Exception("{} component constraint party id, please check role config:{}".format(cpn, job_runtime_conf.get('role')))
 

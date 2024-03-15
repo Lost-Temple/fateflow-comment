@@ -31,7 +31,7 @@ def stop_job(job_id, role, party_id, stop_status):
 
 
 @manager.route('/<job_id>/<role>/<party_id>/rerun', methods=['POST'])
-def rerun_job(job_id, role, party_id):
+def rerun_job(job_id, role, party_id):  # rerun job 的接口
     DAGScheduler.set_job_rerun(job_id=job_id, initiator_role=role, initiator_party_id=party_id,
                                component_name=request.json.get("component_name"),
                                force=request.json.get("force", False),

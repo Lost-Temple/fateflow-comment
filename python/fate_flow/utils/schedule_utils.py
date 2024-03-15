@@ -107,8 +107,8 @@ def get_job_dsl_parser(dsl=None, runtime_conf=None, pipeline_dsl=None, train_run
 
     dsl_parser = get_dsl_parser_by_version(parser_version)
     if not job_type:
-        job_type = JobRuntimeConfigAdapter(runtime_conf).get_job_type()
-    dsl_parser.run(dsl=dsl,
+        job_type = JobRuntimeConfigAdapter(runtime_conf).get_job_type()  # 如：train
+    dsl_parser.run(dsl=dsl,  # 调用的是 fateflow/python/fate_flow/scheduler/dsl_parser.py 中的 run
                    runtime_conf=runtime_conf,
                    pipeline_dsl=pipeline_dsl,
                    pipeline_runtime_conf=train_runtime_conf,

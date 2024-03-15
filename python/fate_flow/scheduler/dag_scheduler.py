@@ -52,7 +52,7 @@ class DAGScheduler(Cron):
         try:
             dsl = submit_job_conf.dsl
             runtime_conf = deepcopy(submit_job_conf.runtime_conf)  # runtime_conf 就是http post请求体中的job_runtime_conf
-            job_utils.check_job_conf(runtime_conf, dsl)
+            job_utils.check_job_conf(runtime_conf, dsl)  # 检查配置
             job_initiator = runtime_conf["initiator"]
             conf_adapter = JobRuntimeConfigAdapter(runtime_conf)  # 配置适配器，DSL版本不同，runtime_conf会有所有不同
             common_job_parameters = conf_adapter.get_common_parameters()
@@ -64,9 +64,9 @@ class DAGScheduler(Cron):
                 conf_version = schedule_utils.get_conf_version(runtime_conf)  # 获取dsl_version的值
                 if conf_version != 2:  # 这里校验一下版本，版本还是硬编码的...也就是说非predict类型的JOB，DSL版本必须为2
                     raise Exception("only the v2 version runtime conf is supported")
-                # 生成模型id
+                # 生成模型id, 例：arbiter-10000#guest-9999#host-10000#model , arbiter guest host 升序排列
                 common_job_parameters.model_id = model_utils.gen_model_id(runtime_conf["role"])
-                common_job_parameters.model_version = job_id  # 把job_id 赋给model_version ???
+                common_job_parameters.model_version = job_id  # 把job_id 赋给model_version
                 train_runtime_conf = {}  # 如果是训练，train_runtime_conf 为 {}
             else:  # job_type 是predict的分支
                 # check predict job parameters # 检查参数
@@ -81,8 +81,8 @@ class DAGScheduler(Cron):
                         role=tracker.role, party_id=tracker.party_id,
                         model_id=tracker.model_id, model_version=tracker.model_version,
                     )
-                    if sync_model.remote_exists():
-                        sync_model.download(True)  # 这里参数是True，表示强制更新本地缓存中的模型
+                    if sync_model.remote_exists():  # 如果pipeline模型在远程存储存在
+                        sync_model.download(True)  # 这里参数是True，表示强制更新本地缓存中的模型（把远程存储的模型下载到本地）
 
                 if not model_utils.check_if_deployed(  # 检查模型是否已部署
                     role=tracker.role, party_id=tracker.party_id,
@@ -436,16 +436,16 @@ class DAGScheduler(Cron):
             FederatedScheduler.sync_job_status(job=job)
         schedule_logger(job.f_job_id).info("finish scheduling running job")
 
-    @classmethod
+    @classmethod  # rerun job
     def set_job_rerun(cls, job_id, initiator_role, initiator_party_id, auto, force=False,
                       tasks: typing.List[Task] = None, component_name: typing.Union[str, list] = None):
         schedule_logger(job_id).info(f"try to rerun job on initiator {initiator_role} {initiator_party_id}")
-
+        # 先查询到这个JOB（initiator）
         jobs = JobSaver.query_job(job_id=job_id, role=initiator_role, party_id=initiator_party_id)
         if not jobs:
             raise RuntimeError(f"can not found job on initiator {initiator_role} {initiator_party_id}")
-        job = jobs[0]
-
+        job = jobs[0]  # 在数据库中查找到了这个job
+        # 获取fate_flow.scheduler.dsl_parser.DSLParserV2 对象
         dsl_parser = schedule_utils.get_job_dsl_parser(dsl=job.f_dsl,
                                                        runtime_conf=job.f_runtime_conf_on_party,
                                                        train_runtime_conf=job.f_train_runtime_conf)
@@ -461,7 +461,7 @@ class DAGScheduler(Cron):
                 'party_id': initiator_party_id,
             }
 
-            if not component_name or component_name == job_utils.PIPELINE_COMPONENT_NAME:
+            if not component_name or component_name == job_utils.PIPELINE_COMPONENT_NAME:  # 未指定组件名或组件名是pipeline
                 # rerun all tasks
                 schedule_logger(job_id).info("require all component of pipeline to rerun")
             else:

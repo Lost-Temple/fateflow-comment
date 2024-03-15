@@ -64,10 +64,10 @@ def stop_job():
         return get_json_result(retcode=RetCode.DATA_ERROR, retmsg="can not found job")
 
 
-@manager.route('/rerun', methods=['POST'])
-def rerun_job():
+@manager.route('/rerun', methods=['POST'])  # job rerun 的起始入口
+def rerun_job():  # job 重运行，可以指定从哪个组件开始运行
     job_id = request.json.get("job_id")
-    jobs = JobSaver.query_job(job_id=job_id)
+    jobs = JobSaver.query_job(job_id=job_id)  # 先查找数据库里面是否存在这个job
     if jobs:
         status_code, response = FederatedScheduler.request_rerun_job(job=jobs[0], command_body=request.json)
         if status_code == FederatedSchedulingStatusCode.SUCCESS:

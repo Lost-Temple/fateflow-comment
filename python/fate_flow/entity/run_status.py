@@ -51,7 +51,7 @@ class BaseStateTransitionRule(object):
             return True
 
 
-class JobStatus(BaseStatus):
+class JobStatus(BaseStatus):  # JOB的状态
     READY = StatusSet.READY
     WAITING = StatusSet.WAITING
     RUNNING = StatusSet.RUNNING

@@ -26,7 +26,7 @@ from fate_flow.utils import schedule_utils
 from fate_flow.utils.base_utils import compare_version, get_fate_flow_directory
 
 
-def all_party_key(all_party):
+def all_party_key(all_party):  # 内部把 guest host arbiter 进行升序排列
     """
     Join all party as party key
     :param :

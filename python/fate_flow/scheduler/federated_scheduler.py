@@ -154,13 +154,13 @@ class FederatedScheduler(SchedulerBase):
     def job_command(cls, job, command, command_body=None, dest_only_initiator=False, specific_dest=None, parallel=False):
         federated_response = {}
         job_parameters = job.f_runtime_conf_on_party["job_parameters"]
-        if dest_only_initiator:
+        if dest_only_initiator:  # 只向initator方发送这个命令
             dest_partis = [(job.f_initiator_role, [job.f_initiator_party_id])]
             api_type = "initiator"
-        elif specific_dest:
+        elif specific_dest:  # 指定发送到哪些参与方
             dest_partis = specific_dest.items()
             api_type = "party"
-        else:
+        else:  # 发给所有参与方
             dest_partis = job.f_roles.items()
             api_type = "party"
         threads = []

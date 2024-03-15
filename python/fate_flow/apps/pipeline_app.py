@@ -19,7 +19,7 @@ from fate_flow.utils.api_utils import get_json_result
 from fate_flow.manager import pipeline_manager
 
 
-@manager.route('/dag/dependency', methods=['post'])
+@manager.route('/dag/dependency', methods=['post'])  # 返回DAG 图的JSON描述，前端可以绘制出DAG图
 def pipeline_dag_dependency():
     dependency = pipeline_manager.pipeline_dag_dependency(request.json)
     if dependency:
