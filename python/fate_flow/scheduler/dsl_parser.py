@@ -167,7 +167,7 @@ class BaseDSLParser(object):
         for component in self.components:
             name = component.get_name()
             for chk in name:
-                if chk.isalpha() or chk in ["_", "-"] or chk.isdigit():
+                if chk.isalpha() or chk in ["_", "-"] or chk.isdigit():  # 组件名只允许字母、数字、下划线、中横
                     continue
                 else:
                     raise NamingFormatError(component=name)
@@ -191,7 +191,7 @@ class BaseDSLParser(object):
                 raise ComponentInputTypeError(component=name)
             else:
                 self.components[idx].set_input(upstream_input)
-
+            # 训练和预测两类job，组件的输入的要求是不同的
             if mode == "train":
                 input_keywords = {"model": "model", "isometric_model": "model", "cache": "cache"}
             else:
